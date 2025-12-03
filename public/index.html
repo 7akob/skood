@@ -9,13 +9,13 @@
   <style>
     body { font-family: sans-serif; max-width: 800px; margin: 20px auto; }
     #chatBox { border: 1px solid #ccc; height: 200px; overflow-y: auto; padding: 5px; }
-      body {
-    background: #000080 url("https://i.imgur.com/dxVxq.gif") repeat; /* starfield background */
-    font-family: "Comic Sans MS", "Tahoma", sans-serif;
-    color: #00FFEA;
-    text-align: center;
-    padding: 20px;
-  }
+body {
+  background: #000080;
+  font-family: "Comic Sans MS", "Tahoma", sans-serif;
+  color: #00FFEA;
+  text-align: center;
+  padding: 20px;
+}
 
   h1 {
     color: #FFFF00;
@@ -118,6 +118,10 @@ let socket;
 let player;
 let suppressEvents = false; 
 let lastState = null;
+
+// Generate a random username
+const username = "User" + Math.floor(Math.random() * 999);
+
 
 // -------------------- SOCKET --------------------------
 
@@ -253,25 +257,11 @@ function sendMessage() {
   const msg = input.value.trim();
   if (!msg) return;
 
-  socket.emit("chat_message", msg);
-
-  // Optional: Add local echo (like MSN Messenger)
-  const time = new Date().toLocaleTimeString();
-
-  const box = document.getElementById("chatBox");
-  const el = document.createElement("div");
-  el.className = "message";
-  el.innerHTML = `
-    <span style="color:#FFFF00;">[${time}]</span>
-    <span style="color:#00FF00;"><b>You:</b></span>
-    <span style="color:#FFFFFF;">${msg}</span>
-  `;
-
-  box.appendChild(el);
-  box.scrollTop = box.scrollHeight;
+  socket.emit("chat_message", { user: username, text: msg });
 
   input.value = "";
 }
+
 
 
 socket.on("chat_message", (msg) => {
