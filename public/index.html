@@ -1,103 +1,181 @@
 <!DOCTYPE html>
 <html>
-
 <head>
+  <meta charset="utf-8">
   <title>Watch Together</title>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
+
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 20px auto; }
+    #chatBox { border: 1px solid #ccc; height: 200px; overflow-y: auto; padding: 5px; }
+  </style>
 </head>
-
 <body>
-  <h1>YouTube Watch Together</h1>
 
-  <input id="videoInput" placeholder="YouTube link">
-  <button onclick="loadVideo()">Load video</button>
+<h1>YouTube Watch Together</h1>
 
-  <div id="player"></div>
+<input id="videoInput" placeholder="Paste YouTube link or video ID">
+<button onclick="loadVideo()">Load Video</button>
 
-  <h3>Chat</h3>
-  <div id="chatBox" style="border:1px solid #ccc; width:300px; height:200px; overflow-y:auto; padding:5px;"></div>
-  <input id="chatInput" placeholder="Type a message" />
-  <button onclick="sendMessage()">Send</button>
+<div id="player" style="margin-top: 10px;"></div>
 
-  <script>
-    const socket = io();
-    let player;
+<h2>Chat</h2>
+<div id="chatBox"></div>
+<input id="chatInput" placeholder="Type a message">
+<button onclick="sendMessage()">Send</button>
 
-    // Load IFrame API
-    function onYouTubeIframeAPIReady() {
-      player = new YT.Player("player", {
-        height: "360",
-        width: "640",
-        playerVars: {
-          autoplay: 0,
-          controls: 1,
-          origin: window.location.origin,
-          enablejsapi: 1,
-          modestbranding: 1
-        },
-        videoId: "",
-        events: { onStateChange: handleStateChange }
-      });
+<script>
+let socket;
+let player;
+let suppressEvents = false; 
+let lastState = null;
 
-    }
+// -------------------- SOCKET --------------------------
 
-    function extractVideoId(url) {
-      const match = url.match(/v=([^&]+)/);
-      return match ? match[1] : url;
-    }
+socket = io({
+  transports: ["websocket"]
+});
 
-    function loadVideo() {
-      const link = document.getElementById("videoInput").value;
-      const id = extractVideoId(link);
-      socket.emit("change_video", id);
-      player.loadVideoById(id);
-    }
+socket.on("sync_state", (s) => {
+  if (!player) {
+    pendingSync = s;
+  } else {
+    applySync(s);
+  }
+});
 
-    // Send events
-    function handleStateChange(event) {
-      const time = player.getCurrentTime();
+socket.on("change_video", (id) => {
+  suppressEvents = true;
+  player.loadVideoById(id);
+  player.seekTo(0, true);
+  resetSuppress();
+});
 
-      if (event.data === YT.PlayerState.PLAYING) {
-        socket.emit("play", time);
-      }
-      if (event.data === YT.PlayerState.PAUSED) {
-        socket.emit("pause", time);
-      }
-    }
+socket.on("play", (t) => {
+  suppressEvents = true;
+  player.seekTo(t, true);
+  player.playVideo();
+  lastState = YT.PlayerState.PLAYING;
+  resetSuppress();
+});
 
-    // Receive events
-    socket.on("change_video", (id) => player.loadVideoById(id));
-    socket.on("play", (t) => { player.seekTo(t, true); player.playVideo(); });
-    socket.on("pause", (t) => { player.seekTo(t, true); player.pauseVideo(); });
-    socket.on("seek", (t) => player.seekTo(t, true));
+socket.on("pause", (t) => {
+  suppressEvents = true;
+  player.seekTo(t, true);
+  player.pauseVideo();
+  lastState = YT.PlayerState.PAUSED;
+  resetSuppress();
+});
 
-    socket.on("sync_state", (state) => {
-      if (state.videoId) player.loadVideoById(state.videoId);
-      player.seekTo(state.time || 0);
-      if (state.isPlaying) player.playVideo();
-    });
+socket.on("seek", (t) => {
+  suppressEvents = true;
+  player.seekTo(t, true);
+  resetSuppress();
+});
 
+// -------------------- YOUTUBE --------------------------
 
-    // Chat sending function
-    function sendMessage() {
-      const input = document.getElementById("chatInput");
-      if (input.value.trim() === "") return;
-      socket.emit("chat_message", input.value);
-      input.value = "";
-    }
+let pendingSync = null;
 
-    // Receive message
-    socket.on("chat_message", (msg) => {
-      const box = document.getElementById("chatBox");
-      const el = document.createElement("div");
-      el.textContent = msg;
-      box.appendChild(el);
-      box.scrollTop = box.scrollHeight;
-    });
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player("player", {
+    height: "360",
+    width: "640",
+    videoId: "",
+    playerVars: {
+      autoplay: 0,
+      controls: 1,
+      origin: window.location.origin,
+      enablejsapi: 1,
+      modestbranding: 1
+    },
+    events: { onStateChange }
+  });
 
-  </script>
+  if (pendingSync) {
+    applySync(pendingSync);
+    pendingSync = null;
+  }
+}
+
+function applySync(state) {
+  if (!player) return;
+
+  suppressEvents = true;
+  player.loadVideoById(state.videoId);
+  player.seekTo(state.time, true);
+
+  if (state.isPlaying) {
+    player.playVideo();
+    lastState = YT.PlayerState.PLAYING;
+  } else {
+    player.pauseVideo();
+    lastState = YT.PlayerState.PAUSED;
+  }
+
+  resetSuppress();
+}
+
+function loadVideo() {
+  const input = document.getElementById("videoInput").value.trim();
+  if (!input) return;
+
+  const id = extractId(input);
+  socket.emit("change_video", id);
+
+  suppressEvents = true;
+  player.loadVideoById(id);
+  player.seekTo(0);
+  lastState = null;
+  resetSuppress();
+}
+
+function extractId(str) {
+  const m1 = str.match(/v=([^&]+)/);
+  if (m1) return m1[1];
+  const m2 = str.match(/youtu\.be\/([^?]+)/);
+  if (m2) return m2[1];
+  return str;
+}
+
+function onStateChange(event) {
+  if (suppressEvents) return;
+
+  const state = event.data;
+  if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.PAUSED) return;
+
+  if (state === lastState) return;
+  lastState = state;
+
+  const t = player.getCurrentTime();
+
+  if (state === YT.PlayerState.PLAYING) socket.emit("play", t);
+  if (state === YT.PlayerState.PAUSED) socket.emit("pause", t);
+}
+
+function resetSuppress() {
+  setTimeout(() => suppressEvents = false, 300);
+}
+
+// ------------------- CHAT ---------------------
+
+function sendMessage() {
+  const input = document.getElementById("chatInput");
+  const msg = input.value.trim();
+  if (!msg) return;
+  socket.emit("chat_message", msg);
+  input.value = "";
+}
+
+socket.on("chat_message", (msg) => {
+  const el = document.createElement("div");
+  el.textContent = msg;
+  const box = document.getElementById("chatBox");
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+});
+</script>
 
 </body>
-
 </html>

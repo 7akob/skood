@@ -3,53 +3,74 @@ const http = require("http");
 const { Server } = require("socket.io");
 
 const app = express();
-app.use(express.static("public")); // serve frontend folder
+app.use(express.static("public"));
 
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  transports: ["websocket"],
+  cors: { origin: "*", methods: ["GET", "POST"] }
+});
 
+// Shared sync state
 let state = {
   videoId: null,
   time: 0,
   isPlaying: false,
+  lastUpdate: Date.now()
 };
 
 io.on("connection", (socket) => {
-  console.log("A user connected");
+  console.log("Client connected:", socket.id);
 
-  // sync new user
-  socket.emit("sync_state", state);
+  // Send current state to new client
+  socket.emit("sync_state", getCurrentState());
 
-  // --- CHAT FEATURE ---
+  // Chat message
   socket.on("chat_message", (msg) => {
-    console.log("Chat:", msg);
     io.emit("chat_message", msg);
   });
 
-  // --- VIDEO EVENTS ---
+  // Change video
   socket.on("change_video", (videoId) => {
     state.videoId = videoId;
-    io.emit("change_video", videoId);
+    state.time = 0;
+    state.isPlaying = false;
+    state.lastUpdate = Date.now();
+    socket.broadcast.emit("change_video", videoId);
   });
 
+  // Play
   socket.on("play", (time) => {
     state.isPlaying = true;
     state.time = time;
-    io.emit("play", time);
+    state.lastUpdate = Date.now();
+    socket.broadcast.emit("play", time);
   });
 
+  // Pause
   socket.on("pause", (time) => {
     state.isPlaying = false;
     state.time = time;
-    io.emit("pause", time);
+    state.lastUpdate = Date.now();
+    socket.broadcast.emit("pause", time);
   });
 
+  // Seek
   socket.on("seek", (time) => {
     state.time = time;
-    io.emit("seek", time);
+    state.lastUpdate = Date.now();
+    socket.broadcast.emit("seek", time);
   });
 });
 
-server.listen(3000, () =>
-  console.log("Server running at http://localhost:3000")
-);
+function getCurrentState() {
+  let t = state.time;
+  if (state.isPlaying) {
+    const delta = (Date.now() - state.lastUpdate) / 1000;
+    t += delta;
+  }
+  return { ...state, time: t };
+}
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log("Server running on port", PORT));
