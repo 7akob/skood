@@ -2,18 +2,106 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Watch Together</title>
+  <title>Skåda på tv</title>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <style>
     body { font-family: sans-serif; max-width: 800px; margin: 20px auto; }
     #chatBox { border: 1px solid #ccc; height: 200px; overflow-y: auto; padding: 5px; }
+      body {
+    background: #000080 url("https://i.imgur.com/dxVxq.gif") repeat; /* starfield background */
+    font-family: "Comic Sans MS", "Tahoma", sans-serif;
+    color: #00FFEA;
+    text-align: center;
+    padding: 20px;
+  }
+
+  h1 {
+    color: #FFFF00;
+    text-shadow: 2px 2px #FF00FF;
+    font-size: 40px;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    color: #00FF00;
+    text-shadow: 1px 1px black;
+  }
+
+  input, button {
+    font-family: "Comic Sans MS", Arial;
+    font-size: 16px;
+    padding: 8px;
+    border: 3px solid #FF00FF;
+    background: linear-gradient(90deg, #00FFFF, #FF00FF);
+    color: black;
+    margin: 5px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 4px black;
+  }
+
+  button:hover {
+    background: linear-gradient(90deg, #FFFF00, #00FF00);
+    cursor: pointer;
+  }
+
+  #player {
+    border: 5px double #FFFF00;
+    box-shadow: 0 0 20px #FF00FF;
+    margin-top: 15px;
+  }
+
+  #chatBox {
+    border: 4px ridge #00FFFF;
+    background: rgba(0, 0, 0, 0.5);
+    width: 350px;
+    height: 250px;
+    margin: 0 auto;
+    color: #00FFEA;
+    overflow-y: auto;
+    padding: 10px;
+    font-size: 14px;
+    box-shadow: inset 0 0 10px #00FFFF;
+  }
+
+  #chatInput {
+    width: 250px;
+    background: #FFFFCC;
+    color: black;
+  }
+
+  .message {
+    border-bottom: 1px dotted #00FFFF;
+    padding: 4px;
+  }
+
+  .retro-divider {
+    margin: 20px auto;
+    width: 90%;
+    height: 5px;
+    background: repeating-linear-gradient(
+      45deg,
+      #FF00FF,
+      #FF00FF 10px,
+      #00FFFF 10px,
+      #00FFFF 20px
+    );
+    box-shadow: 0 0 10px #00FFFF;
+  }
+  .message {
+  padding: 4px;
+  margin: 2px 0;
+  border-bottom: 1px dotted #00FFFF;
+  font-family: "Comic Sans MS", Tahoma, sans-serif;
+  text-align: left;
+}
+
   </style>
 </head>
 <body>
 
-<h1>YouTube Watch Together</h1>
+<h1>Skåda Youtube socket</h1>
 
 <input id="videoInput" placeholder="Paste YouTube link or video ID">
 <button onclick="loadVideo()">Load Video</button>
@@ -164,17 +252,46 @@ function sendMessage() {
   const input = document.getElementById("chatInput");
   const msg = input.value.trim();
   if (!msg) return;
+
   socket.emit("chat_message", msg);
+
+  // Optional: Add local echo (like MSN Messenger)
+  const time = new Date().toLocaleTimeString();
+
+  const box = document.getElementById("chatBox");
+  const el = document.createElement("div");
+  el.className = "message";
+  el.innerHTML = `
+    <span style="color:#FFFF00;">[${time}]</span>
+    <span style="color:#00FF00;"><b>You:</b></span>
+    <span style="color:#FFFFFF;">${msg}</span>
+  `;
+
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+
   input.value = "";
 }
 
+
 socket.on("chat_message", (msg) => {
-  const el = document.createElement("div");
-  el.textContent = msg;
   const box = document.getElementById("chatBox");
+
+  // 90s style timestamp
+  const time = new Date().toLocaleTimeString();
+
+  const el = document.createElement("div");
+  el.className = "message";
+  el.innerHTML = `
+    <span style="color:#FFFF00;">[${time}]</span>
+    <span style="color:#00FFEA;"><b>Friend:</b></span>
+    <span style="color:#FFFFFF;">${msg}</span>
+  `;
+
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
 });
+
 </script>
 
 </body>
