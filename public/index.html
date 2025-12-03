@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Watch Together</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+  <h1>YouTube Watch Together</h1>
+
+  <input id="videoInput" placeholder="YouTube link">
+  <button onclick="loadVideo()">Load video</button>
+
+  <div id="player"></div>
+
+<script>
+const socket = io("http://localhost:3000");
+let player;
+
+// Load IFrame API
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player("player", {
+    height: "360",
+    width: "640",
+    videoId: "",
+    events: {
+      onStateChange: handleStateChange
+    }
+  });
+}
+
+function extractVideoId(url) {
+  const match = url.match(/v=([^&]+)/);
+  return match ? match[1] : url;
+}
+
+function loadVideo() {
+  const link = document.getElementById("videoInput").value;
+  const id = extractVideoId(link);
+  socket.emit("change_video", id);
+  player.loadVideoById(id);
+}
+
+// Send events
+function handleStateChange(event) {
+  const time = player.getCurrentTime();
+
+  if (event.data === YT.PlayerState.PLAYING) {
+    socket.emit("play", time);
+  }
+  if (event.data === YT.PlayerState.PAUSED) {
+    socket.emit("pause", time);
+  }
+}
+
+// Receive events
+socket.on("change_video", (id) => player.loadVideoById(id));
+socket.on("play", (t) => { player.seekTo(t, true); player.playVideo(); });
+socket.on("pause", (t) => { player.seekTo(t, true); player.pauseVideo(); });
+socket.on("seek", (t) => player.seekTo(t, true));
+
+socket.on("sync_state", (state) => {
+  if (state.videoId) player.loadVideoById(state.videoId);
+  player.seekTo(state.time || 0);
+  if (state.isPlaying) player.playVideo();
+});
+</script>
+
+</body>
+</html>
