@@ -264,23 +264,34 @@ function sendMessage() {
 
 
 
-socket.on("chat_message", (msg) => {
+socket.on("chat_message", (data) => {
+  const { user, text } = data;
   const box = document.getElementById("chatBox");
-
-  // 90s style timestamp
   const time = new Date().toLocaleTimeString();
 
   const el = document.createElement("div");
   el.className = "message";
-  el.innerHTML = `
-    <span style="color:#FFFF00;">[${time}]</span>
-    <span style="color:#00FFEA;"><b>Friend:</b></span>
-    <span style="color:#FFFFFF;">${msg}</span>
-  `;
+
+  if (user === username) {
+    // YOU
+    el.innerHTML = `
+      <span style="color:#FFFF00;">[${time}]</span>
+      <span style="color:#00FF00;"><b>You:</b></span>
+      <span style="color:#FFFFFF;">${text}</span>
+    `;
+  } else {
+    // FRIENDS
+    el.innerHTML = `
+      <span style="color:#FFFF00;">[${time}]</span>
+      <span style="color:#00FFEA;"><b>${user}:</b></span>
+      <span style="color:#FFFFFF;">${text}</span>
+    `;
+  }
 
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
 });
+
 
 </script>
 

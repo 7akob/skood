@@ -26,34 +26,10 @@ io.on("connection", (socket) => {
   socket.emit("sync_state", getCurrentState());
 
   // Chat message
-socket.on("chat_message", (data) => {
-  const { user, text } = data;
-  const box = document.getElementById("chatBox");
+  socket.on("chat_message", (data) => {
+    io.emit("chat_message", data);
+  });
 
-  const time = new Date().toLocaleTimeString();
-
-  const el = document.createElement("div");
-  el.className = "message";
-
-  if (user === username) {
-    // YOU
-    el.innerHTML = `
-      <span style="color:#FFFF00;">[${time}]</span>
-      <span style="color:#00FF00;"><b>You:</b></span>
-      <span style="color:#FFFFFF;">${text}</span>
-    `;
-  } else {
-    // FRIENDS
-    el.innerHTML = `
-      <span style="color:#FFFF00;">[${time}]</span>
-      <span style="color:#00FFEA;"><b>${user}:</b></span>
-      <span style="color:#FFFFFF;">${text}</span>
-    `;
-  }
-
-  box.appendChild(el);
-  box.scrollTop = box.scrollHeight;
-});
 
 
   // Change video
