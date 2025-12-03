@@ -17,8 +17,16 @@ let state = {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
+  // sync new user
   socket.emit("sync_state", state);
 
+  // --- CHAT FEATURE ---
+  socket.on("chat_message", (msg) => {
+    console.log("Chat:", msg);
+    io.emit("chat_message", msg);
+  });
+
+  // --- VIDEO EVENTS ---
   socket.on("change_video", (videoId) => {
     state.videoId = videoId;
     io.emit("change_video", videoId);
