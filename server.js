@@ -19,7 +19,7 @@ let state = {
   lastUpdate: Date.now()
 };
 
-let queue = []; // Array of { id, title }
+let queue = []; // Array of { id, title, addedBy }
 
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
@@ -30,6 +30,12 @@ io.on("connection", (socket) => {
   // Chat message
   socket.on("chat_message", (data) => {
     io.emit("chat_message", data);
+  });
+
+  // System/activity message (client-initiated, e.g. "User loaded a video")
+  socket.on("system_message", (msg) => {
+    if (typeof msg !== "string") return;
+    io.emit("system_message", msg);
   });
 
   // Change video
@@ -67,8 +73,14 @@ io.on("connection", (socket) => {
   // Queue: add item
   socket.on("add_to_queue", (item) => {
     if (!item || !item.id) return;
-    queue.push({ id: item.id, title: item.title || item.id });
+    const entry = {
+      id: item.id,
+      title: item.title || item.id,
+      addedBy: item.addedBy || "?"
+    };
+    queue.push(entry);
     io.emit("queue_update", queue);
+    io.emit("system_message", `${entry.addedBy} added "${entry.title}" to the queue`);
   });
 
   // Queue: remove item by index
@@ -79,9 +91,10 @@ io.on("connection", (socket) => {
   });
 
   // Queue: clear all
-  socket.on("clear_queue", () => {
+  socket.on("clear_queue", (user) => {
     queue = [];
     io.emit("queue_update", queue);
+    io.emit("system_message", `${user || "Someone"} cleared the queue`);
   });
 
   // Queue: advance when video ends — deduped by checking endedId matches current
@@ -94,10 +107,11 @@ io.on("connection", (socket) => {
     state.lastUpdate = Date.now();
     io.emit("change_video", next.id);
     io.emit("queue_update", queue);
+    io.emit("system_message", `▶ Now playing: "${next.title}"`);
   });
 
   // Queue: manual skip to next
-  socket.on("skip_video", () => {
+  socket.on("skip_video", (user) => {
     if (queue.length === 0) return;
     const next = queue.shift();
     state.videoId = next.id;
@@ -106,6 +120,7 @@ io.on("connection", (socket) => {
     state.lastUpdate = Date.now();
     io.emit("change_video", next.id);
     io.emit("queue_update", queue);
+    io.emit("system_message", `${user || "Someone"} skipped to "${next.title}"`);
   });
 });
 

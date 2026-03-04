@@ -19,7 +19,7 @@ h1 {
   color: #FFFF00;
   text-shadow: 2px 2px #FF00FF;
   font-size: 40px;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 h2 {
@@ -77,6 +77,16 @@ button:hover {
   text-align: left;
 }
 
+.sys-message {
+  padding: 3px 4px;
+  margin: 2px 0;
+  border-bottom: 1px dotted #333;
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+  text-align: left;
+}
+
 .retro-divider {
   margin: 20px auto;
   width: 90%;
@@ -91,6 +101,33 @@ button:hover {
   box-shadow: 0 0 10px #00FFFF;
 }
 
+/* ---- User bar ---- */
+#userBar {
+  font-size: 13px;
+  color: #00FFEA;
+  margin-bottom: 10px;
+}
+
+#usernameDisplay {
+  color: #FFFF00;
+  font-weight: bold;
+}
+
+.btn-icon {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  padding: 0 4px;
+  margin: 0;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.btn-icon:hover {
+  background: none !important;
+}
+
 /* ---- Now Playing ---- */
 #nowPlaying {
   font-size: 15px;
@@ -100,20 +137,20 @@ button:hover {
 }
 
 #starBtn {
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
   font-size: 22px;
   color: #FFFF00;
-  cursor: pointer;
-  padding: 0 4px;
-  margin: 0;
-  vertical-align: middle;
-  line-height: 1;
 }
 
 #starBtn:hover {
-  background: none !important;
+  color: #FF00FF;
+}
+
+#renameBtn {
+  font-size: 16px;
+  color: #00FFEA;
+}
+
+#renameBtn:hover {
   color: #FF00FF;
 }
 
@@ -183,14 +220,26 @@ button:hover {
   border-color: #FF00FF;
 }
 
-.item-title {
+.item-meta {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item-title {
   color: #00FFEA;
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-width: 0;
+}
+
+.item-by {
+  font-size: 10px;
+  color: #777;
+  font-style: italic;
 }
 
 .btn-small {
@@ -213,13 +262,18 @@ button:hover {
 
 <h1>Skåda Youtube socket</h1>
 
+<div id="userBar">
+  Playing as: <span id="usernameDisplay"></span>
+  <button class="btn-icon" id="renameBtn" onclick="editUsername()" title="Change name">✎</button>
+</div>
+
 <input id="videoInput" placeholder="Paste YouTube link or video ID" onkeydown="if(event.key==='Enter') loadVideo()">
 <button onclick="loadVideo()">Load Video</button>
 <button onclick="addToQueue()">+ Queue</button>
 
 <div id="nowPlaying">
   <span id="nowTitle" style="vertical-align:middle;">No video loaded</span>
-  <button id="starBtn" onclick="toggleFavorite()" title="Toggle favorite">☆</button>
+  <button class="btn-icon" id="starBtn" onclick="toggleFavorite()" title="Toggle favorite">☆</button>
 </div>
 
 <div id="player"></div>
@@ -258,7 +312,27 @@ let pendingSync = null;
 let currentVideoId = null;
 let currentVideoTitle = null;
 
-const username = "User" + Math.floor(Math.random() * 999);
+// Username — prompt on first visit, otherwise use stored value
+let username = localStorage.getItem("yt_username");
+if (!username) {
+  let entered = "";
+  while (!entered) {
+    entered = (prompt("Welcome! What's your name?") || "").trim().slice(0, 20);
+  }
+  username = entered;
+  localStorage.setItem("yt_username", username);
+}
+document.getElementById("usernameDisplay").textContent = username;
+
+function editUsername() {
+  const newName = prompt("Enter your name:", username);
+  if (newName === null) return;
+  const trimmed = newName.trim().slice(0, 20);
+  if (!trimmed) return;
+  username = trimmed;
+  localStorage.setItem("yt_username", username);
+  document.getElementById("usernameDisplay").textContent = username;
+}
 
 
 // -------------------- SOCKET --------------------------
@@ -306,6 +380,10 @@ socket.on("seek", (t) => {
   suppressEvents = true;
   player.seekTo(t, true);
   resetSuppress();
+});
+
+socket.on("system_message", (msg) => {
+  appendSystemMessage(msg);
 });
 
 
@@ -361,8 +439,10 @@ function loadVideo() {
   player.seekTo(0);
   lastState = null;
   resetSuppress();
-  setNowPlaying(id);
   input.value = "";
+
+  // Fetch title then announce
+  setNowPlaying(id, { announce: true });
 }
 
 async function addToQueue() {
@@ -371,7 +451,7 @@ async function addToQueue() {
   if (!val) return;
   const id = extractId(val);
   const title = await fetchTitle(id);
-  socket.emit("add_to_queue", { id, title });
+  socket.emit("add_to_queue", { id, title, addedBy: username });
   input.value = "";
 }
 
@@ -387,15 +467,15 @@ function playFromQueue(index, id) {
   player.seekTo(0);
   lastState = null;
   resetSuppress();
-  setNowPlaying(id);
+  setNowPlaying(id, { announce: true });
 }
 
 function skipVideo() {
-  socket.emit("skip_video");
+  socket.emit("skip_video", username);
 }
 
 function clearQueue() {
-  socket.emit("clear_queue");
+  socket.emit("clear_queue", username);
 }
 
 function extractId(str) {
@@ -432,16 +512,18 @@ function resetSuppress() {
 
 // -------------------- NOW PLAYING + FAVORITES --------------------------
 
-async function setNowPlaying(id) {
+async function setNowPlaying(id, { announce = false } = {}) {
   currentVideoId = id;
   currentVideoTitle = null;
   document.getElementById("nowTitle").textContent = "Loading...";
   updateStarBtn();
   const title = await fetchTitle(id);
-  if (currentVideoId === id) {
-    currentVideoTitle = title;
-    document.getElementById("nowTitle").textContent = title;
-    updateStarBtn();
+  if (currentVideoId !== id) return; // video changed while fetching
+  currentVideoTitle = title;
+  document.getElementById("nowTitle").textContent = title;
+  updateStarBtn();
+  if (announce) {
+    socket.emit("system_message", `${username} loaded "${title}"`);
   }
 }
 
@@ -501,11 +583,11 @@ function loadFavorite(id) {
   player.seekTo(0);
   lastState = null;
   resetSuppress();
-  setNowPlaying(id);
+  setNowPlaying(id, { announce: true });
 }
 
 function queueFavorite(id, title) {
-  socket.emit("add_to_queue", { id, title });
+  socket.emit("add_to_queue", { id, title, addedBy: username });
 }
 
 function renderQueue(q) {
@@ -523,10 +605,19 @@ function renderQueue(q) {
     thumb.src = `https://img.youtube.com/vi/${item.id}/default.jpg`;
     thumb.alt = "";
 
+    const meta = document.createElement("div");
+    meta.className = "item-meta";
+
     const titleEl = document.createElement("span");
     titleEl.className = "item-title";
     titleEl.textContent = item.title;
     titleEl.title = item.title;
+
+    const byEl = document.createElement("span");
+    byEl.className = "item-by";
+    byEl.textContent = "added by " + item.addedBy;
+
+    meta.append(titleEl, byEl);
 
     const btnPlay = document.createElement("button");
     btnPlay.className = "btn-small";
@@ -540,7 +631,7 @@ function renderQueue(q) {
     btnRemove.title = "Remove";
     btnRemove.onclick = () => removeFromQueue(i);
 
-    div.append(thumb, titleEl, btnPlay, btnRemove);
+    div.append(thumb, meta, btnPlay, btnRemove);
     list.appendChild(div);
   });
 }
@@ -561,10 +652,15 @@ function renderFavorites() {
     thumb.src = `https://img.youtube.com/vi/${fav.id}/default.jpg`;
     thumb.alt = "";
 
+    const meta = document.createElement("div");
+    meta.className = "item-meta";
+
     const titleEl = document.createElement("span");
     titleEl.className = "item-title";
     titleEl.textContent = fav.title;
     titleEl.title = fav.title;
+
+    meta.append(titleEl);
 
     const btnLoad = document.createElement("button");
     btnLoad.className = "btn-small";
@@ -584,7 +680,7 @@ function renderFavorites() {
     btnRemove.title = "Remove from favorites";
     btnRemove.onclick = () => removeFavorite(i);
 
-    div.append(thumb, titleEl, btnLoad, btnQueue, btnRemove);
+    div.append(thumb, meta, btnLoad, btnQueue, btnRemove);
     list.appendChild(div);
   });
 }
@@ -631,6 +727,15 @@ socket.on("chat_message", (data) => {
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
 });
+
+function appendSystemMessage(msg) {
+  const box = document.getElementById("chatBox");
+  const el = document.createElement("div");
+  el.className = "sys-message";
+  el.textContent = "⚡ " + msg;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+}
 
 function escHtml(str) {
   return String(str)
