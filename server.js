@@ -19,18 +19,18 @@ let state = {
   lastUpdate: Date.now()
 };
 
+let queue = []; // Array of { id, title }
+
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
 
-  // Send current state to new client
-  socket.emit("sync_state", getCurrentState());
+  // Send current state + queue to new client
+  socket.emit("sync_state", { ...getCurrentState(), queue });
 
   // Chat message
   socket.on("chat_message", (data) => {
     io.emit("chat_message", data);
   });
-
-
 
   // Change video
   socket.on("change_video", (videoId) => {
@@ -62,6 +62,50 @@ io.on("connection", (socket) => {
     state.time = time;
     state.lastUpdate = Date.now();
     socket.broadcast.emit("seek", time);
+  });
+
+  // Queue: add item
+  socket.on("add_to_queue", (item) => {
+    if (!item || !item.id) return;
+    queue.push({ id: item.id, title: item.title || item.id });
+    io.emit("queue_update", queue);
+  });
+
+  // Queue: remove item by index
+  socket.on("remove_from_queue", (index) => {
+    if (index < 0 || index >= queue.length) return;
+    queue.splice(index, 1);
+    io.emit("queue_update", queue);
+  });
+
+  // Queue: clear all
+  socket.on("clear_queue", () => {
+    queue = [];
+    io.emit("queue_update", queue);
+  });
+
+  // Queue: advance when video ends — deduped by checking endedId matches current
+  socket.on("video_ended", (endedId) => {
+    if (endedId !== state.videoId || queue.length === 0) return;
+    const next = queue.shift();
+    state.videoId = next.id;
+    state.time = 0;
+    state.isPlaying = true;
+    state.lastUpdate = Date.now();
+    io.emit("change_video", next.id);
+    io.emit("queue_update", queue);
+  });
+
+  // Queue: manual skip to next
+  socket.on("skip_video", () => {
+    if (queue.length === 0) return;
+    const next = queue.shift();
+    state.videoId = next.id;
+    state.time = 0;
+    state.isPlaying = true;
+    state.lastUpdate = Date.now();
+    io.emit("change_video", next.id);
+    io.emit("queue_update", queue);
   });
 });
 

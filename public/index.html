@@ -7,8 +7,6 @@
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <style>
-    body { font-family: sans-serif; max-width: 800px; margin: 20px auto; }
-    #chatBox { border: 1px solid #ccc; height: 200px; overflow-y: auto; padding: 5px; }
 body {
   background: #000080;
   font-family: "Comic Sans MS", "Tahoma", sans-serif;
@@ -17,79 +15,61 @@ body {
   padding: 20px;
 }
 
-  h1 {
-    color: #FFFF00;
-    text-shadow: 2px 2px #FF00FF;
-    font-size: 40px;
-    margin-bottom: 10px;
-  }
+h1 {
+  color: #FFFF00;
+  text-shadow: 2px 2px #FF00FF;
+  font-size: 40px;
+  margin-bottom: 10px;
+}
 
-  h2 {
-    color: #00FF00;
-    text-shadow: 1px 1px black;
-  }
+h2 {
+  color: #00FF00;
+  text-shadow: 1px 1px black;
+}
 
-  input, button {
-    font-family: "Comic Sans MS", Arial;
-    font-size: 16px;
-    padding: 8px;
-    border: 3px solid #FF00FF;
-    background: linear-gradient(90deg, #00FFFF, #FF00FF);
-    color: black;
-    margin: 5px;
-    border-radius: 5px;
-    box-shadow: 2px 2px 4px black;
-  }
+input, button {
+  font-family: "Comic Sans MS", Arial;
+  font-size: 16px;
+  padding: 8px;
+  border: 3px solid #FF00FF;
+  background: linear-gradient(90deg, #00FFFF, #FF00FF);
+  color: black;
+  margin: 5px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 4px black;
+}
 
-  button:hover {
-    background: linear-gradient(90deg, #FFFF00, #00FF00);
-    cursor: pointer;
-  }
+button:hover {
+  background: linear-gradient(90deg, #FFFF00, #00FF00);
+  cursor: pointer;
+}
 
-  #player {
-    border: 5px double #FFFF00;
-    box-shadow: 0 0 20px #FF00FF;
-    margin-top: 15px;
-  }
+#player {
+  border: 5px double #FFFF00;
+  box-shadow: 0 0 20px #FF00FF;
+  margin-top: 10px;
+}
 
-  #chatBox {
-    border: 4px ridge #00FFFF;
-    background: rgba(0, 0, 0, 0.5);
-    width: 350px;
-    height: 250px;
-    margin: 0 auto;
-    color: #00FFEA;
-    overflow-y: auto;
-    padding: 10px;
-    font-size: 14px;
-    box-shadow: inset 0 0 10px #00FFFF;
-  }
+#chatBox {
+  border: 4px ridge #00FFFF;
+  background: rgba(0, 0, 0, 0.5);
+  width: 350px;
+  height: 250px;
+  margin: 0 auto;
+  color: #00FFEA;
+  overflow-y: auto;
+  padding: 10px;
+  font-size: 14px;
+  box-shadow: inset 0 0 10px #00FFFF;
+}
 
-  #chatInput {
-    width: 250px;
-    background: #FFFFCC;
-    color: black;
-  }
+#chatInput {
+  width: 250px;
+  background: #FFFFCC;
+  color: black;
+}
 
-  .message {
-    border-bottom: 1px dotted #00FFFF;
-    padding: 4px;
-  }
-
-  .retro-divider {
-    margin: 20px auto;
-    width: 90%;
-    height: 5px;
-    background: repeating-linear-gradient(
-      45deg,
-      #FF00FF,
-      #FF00FF 10px,
-      #00FFFF 10px,
-      #00FFFF 20px
-    );
-    box-shadow: 0 0 10px #00FFFF;
-  }
-  .message {
+.message {
   padding: 4px;
   margin: 2px 0;
   border-bottom: 1px dotted #00FFFF;
@@ -97,39 +77,196 @@ body {
   text-align: left;
 }
 
+.retro-divider {
+  margin: 20px auto;
+  width: 90%;
+  height: 5px;
+  background: repeating-linear-gradient(
+    45deg,
+    #FF00FF,
+    #FF00FF 10px,
+    #00FFFF 10px,
+    #00FFFF 20px
+  );
+  box-shadow: 0 0 10px #00FFFF;
+}
+
+/* ---- Now Playing ---- */
+#nowPlaying {
+  font-size: 15px;
+  color: #FFFF00;
+  margin: 8px 0 4px;
+  min-height: 24px;
+}
+
+#starBtn {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 22px;
+  color: #FFFF00;
+  cursor: pointer;
+  padding: 0 4px;
+  margin: 0;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+#starBtn:hover {
+  background: none !important;
+  color: #FF00FF;
+}
+
+/* ---- Queue & Favorites panels ---- */
+#panels {
+  display: flex;
+  gap: 15px;
+  width: 640px;
+  margin: 15px auto 0;
+  text-align: left;
+}
+
+#queuePanel, #favoritesPanel {
+  flex: 1;
+  border: 3px ridge #00FFFF;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  box-shadow: 0 0 10px #00FFFF;
+  min-height: 120px;
+  max-height: 280px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+#favoritesPanel {
+  border-color: #FF00FF;
+  box-shadow: 0 0 10px #FF00FF;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+#favoritesPanel .panel-header h2 {
+  color: #FF00FF;
+}
+
+.queue-item, .fav-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border-bottom: 1px dotted #00FFFF;
+}
+
+.fav-item {
+  border-bottom-color: #FF00FF;
+}
+
+.queue-item img, .fav-item img {
+  width: 72px;
+  height: 54px;
+  object-fit: cover;
+  border: 1px solid #00FFFF;
+  flex-shrink: 0;
+}
+
+.fav-item img {
+  border-color: #FF00FF;
+}
+
+.item-title {
+  flex: 1;
+  color: #00FFEA;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.btn-small {
+  font-size: 11px !important;
+  padding: 2px 5px !important;
+  margin: 1px !important;
+  border-width: 2px !important;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.panel-empty {
+  color: #555;
+  font-size: 13px;
+  font-style: italic;
+}
   </style>
 </head>
 <body>
 
 <h1>Skåda Youtube socket</h1>
 
-<input id="videoInput" placeholder="Paste YouTube link or video ID">
+<input id="videoInput" placeholder="Paste YouTube link or video ID" onkeydown="if(event.key==='Enter') loadVideo()">
 <button onclick="loadVideo()">Load Video</button>
+<button onclick="addToQueue()">+ Queue</button>
 
-<div id="player" style="margin-top: 10px;"></div>
+<div id="nowPlaying">
+  <span id="nowTitle" style="vertical-align:middle;">No video loaded</span>
+  <button id="starBtn" onclick="toggleFavorite()" title="Toggle favorite">☆</button>
+</div>
+
+<div id="player"></div>
+
+<div id="panels">
+  <div id="queuePanel">
+    <div class="panel-header">
+      <h2>Queue</h2>
+      <div>
+        <button class="btn-small" onclick="skipVideo()" title="Skip to next">⏭ Skip</button>
+        <button class="btn-small" onclick="clearQueue()" title="Clear queue">Clear</button>
+      </div>
+    </div>
+    <div id="queueList"><span class="panel-empty">Queue is empty</span></div>
+  </div>
+  <div id="favoritesPanel">
+    <div class="panel-header">
+      <h2>Favorites</h2>
+    </div>
+    <div id="favoritesList"><span class="panel-empty">No favorites yet — star a video!</span></div>
+  </div>
+</div>
+
+<div class="retro-divider"></div>
 
 <h2>Chat</h2>
 <div id="chatBox"></div>
-<input id="chatInput" placeholder="Type a message">
+<input id="chatInput" placeholder="Type a message" onkeydown="if(event.key==='Enter') sendMessage()">
 <button onclick="sendMessage()">Send</button>
 
 <script>
-let socket;
 let player;
-let suppressEvents = false; 
+let suppressEvents = false;
 let lastState = null;
+let pendingSync = null;
+let currentVideoId = null;
+let currentVideoTitle = null;
 
-// Generate a random username
 const username = "User" + Math.floor(Math.random() * 999);
 
 
 // -------------------- SOCKET --------------------------
 
-socket = io({
-  transports: ["websocket"]
-});
+const socket = io({ transports: ["websocket"] });
 
 socket.on("sync_state", (s) => {
+  renderQueue(s.queue || []);
   if (!player) {
     pendingSync = s;
   } else {
@@ -137,11 +274,16 @@ socket.on("sync_state", (s) => {
   }
 });
 
+socket.on("queue_update", (q) => {
+  renderQueue(q);
+});
+
 socket.on("change_video", (id) => {
   suppressEvents = true;
   player.loadVideoById(id);
   player.seekTo(0, true);
   resetSuppress();
+  setNowPlaying(id);
 });
 
 socket.on("play", (t) => {
@@ -166,9 +308,8 @@ socket.on("seek", (t) => {
   resetSuppress();
 });
 
-// -------------------- YOUTUBE --------------------------
 
-let pendingSync = null;
+// -------------------- YOUTUBE --------------------------
 
 function onYouTubeIframeAPIReady() {
   player = new YT.Player("player", {
@@ -191,29 +332,28 @@ function onYouTubeIframeAPIReady() {
   }
 }
 
-function applySync(state) {
-  if (!player) return;
-
+function applySync(s) {
+  if (!player || !s.videoId) return;
   suppressEvents = true;
-  player.loadVideoById(state.videoId);
-  player.seekTo(state.time, true);
-
-  if (state.isPlaying) {
+  player.loadVideoById(s.videoId);
+  player.seekTo(s.time, true);
+  if (s.isPlaying) {
     player.playVideo();
     lastState = YT.PlayerState.PLAYING;
   } else {
     player.pauseVideo();
     lastState = YT.PlayerState.PAUSED;
   }
-
   resetSuppress();
+  setNowPlaying(s.videoId);
 }
 
 function loadVideo() {
-  const input = document.getElementById("videoInput").value.trim();
-  if (!input) return;
+  const input = document.getElementById("videoInput");
+  const val = input.value.trim();
+  if (!val) return;
 
-  const id = extractId(input);
+  const id = extractId(val);
   socket.emit("change_video", id);
 
   suppressEvents = true;
@@ -221,6 +361,41 @@ function loadVideo() {
   player.seekTo(0);
   lastState = null;
   resetSuppress();
+  setNowPlaying(id);
+  input.value = "";
+}
+
+async function addToQueue() {
+  const input = document.getElementById("videoInput");
+  const val = input.value.trim();
+  if (!val) return;
+  const id = extractId(val);
+  const title = await fetchTitle(id);
+  socket.emit("add_to_queue", { id, title });
+  input.value = "";
+}
+
+function removeFromQueue(index) {
+  socket.emit("remove_from_queue", index);
+}
+
+function playFromQueue(index, id) {
+  socket.emit("remove_from_queue", index);
+  socket.emit("change_video", id);
+  suppressEvents = true;
+  player.loadVideoById(id);
+  player.seekTo(0);
+  lastState = null;
+  resetSuppress();
+  setNowPlaying(id);
+}
+
+function skipVideo() {
+  socket.emit("skip_video");
+}
+
+function clearQueue() {
+  socket.emit("clear_queue");
 }
 
 function extractId(str) {
@@ -234,21 +409,189 @@ function extractId(str) {
 function onStateChange(event) {
   if (suppressEvents) return;
 
-  const state = event.data;
-  if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.PAUSED) return;
+  const s = event.data;
 
-  if (state === lastState) return;
-  lastState = state;
+  if (s === YT.PlayerState.ENDED) {
+    socket.emit("video_ended", currentVideoId);
+    return;
+  }
+
+  if (s !== YT.PlayerState.PLAYING && s !== YT.PlayerState.PAUSED) return;
+  if (s === lastState) return;
+  lastState = s;
 
   const t = player.getCurrentTime();
-
-  if (state === YT.PlayerState.PLAYING) socket.emit("play", t);
-  if (state === YT.PlayerState.PAUSED) socket.emit("pause", t);
+  if (s === YT.PlayerState.PLAYING) socket.emit("play", t);
+  if (s === YT.PlayerState.PAUSED) socket.emit("pause", t);
 }
 
 function resetSuppress() {
   setTimeout(() => suppressEvents = false, 300);
 }
+
+
+// -------------------- NOW PLAYING + FAVORITES --------------------------
+
+async function setNowPlaying(id) {
+  currentVideoId = id;
+  currentVideoTitle = null;
+  document.getElementById("nowTitle").textContent = "Loading...";
+  updateStarBtn();
+  const title = await fetchTitle(id);
+  if (currentVideoId === id) {
+    currentVideoTitle = title;
+    document.getElementById("nowTitle").textContent = title;
+    updateStarBtn();
+  }
+}
+
+async function fetchTitle(id) {
+  try {
+    const res = await fetch(
+      `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`
+    );
+    if (!res.ok) return id;
+    const data = await res.json();
+    return data.title || id;
+  } catch {
+    return id;
+  }
+}
+
+function getFavorites() {
+  return JSON.parse(localStorage.getItem("yt_favorites") || "[]");
+}
+
+function saveFavorites(favs) {
+  localStorage.setItem("yt_favorites", JSON.stringify(favs));
+}
+
+function toggleFavorite() {
+  if (!currentVideoId) return;
+  const favs = getFavorites();
+  const idx = favs.findIndex(f => f.id === currentVideoId);
+  if (idx >= 0) {
+    favs.splice(idx, 1);
+  } else {
+    favs.unshift({ id: currentVideoId, title: currentVideoTitle || currentVideoId });
+  }
+  saveFavorites(favs);
+  renderFavorites();
+  updateStarBtn();
+}
+
+function updateStarBtn() {
+  const favs = getFavorites();
+  const isFav = currentVideoId && favs.some(f => f.id === currentVideoId);
+  document.getElementById("starBtn").textContent = isFav ? "★" : "☆";
+}
+
+function removeFavorite(index) {
+  const favs = getFavorites();
+  favs.splice(index, 1);
+  saveFavorites(favs);
+  renderFavorites();
+  updateStarBtn();
+}
+
+function loadFavorite(id) {
+  socket.emit("change_video", id);
+  suppressEvents = true;
+  player.loadVideoById(id);
+  player.seekTo(0);
+  lastState = null;
+  resetSuppress();
+  setNowPlaying(id);
+}
+
+function queueFavorite(id, title) {
+  socket.emit("add_to_queue", { id, title });
+}
+
+function renderQueue(q) {
+  const list = document.getElementById("queueList");
+  if (q.length === 0) {
+    list.innerHTML = '<span class="panel-empty">Queue is empty</span>';
+    return;
+  }
+  list.innerHTML = "";
+  q.forEach((item, i) => {
+    const div = document.createElement("div");
+    div.className = "queue-item";
+
+    const thumb = document.createElement("img");
+    thumb.src = `https://img.youtube.com/vi/${item.id}/default.jpg`;
+    thumb.alt = "";
+
+    const titleEl = document.createElement("span");
+    titleEl.className = "item-title";
+    titleEl.textContent = item.title;
+    titleEl.title = item.title;
+
+    const btnPlay = document.createElement("button");
+    btnPlay.className = "btn-small";
+    btnPlay.textContent = "▶";
+    btnPlay.title = "Play now";
+    btnPlay.onclick = () => playFromQueue(i, item.id);
+
+    const btnRemove = document.createElement("button");
+    btnRemove.className = "btn-small";
+    btnRemove.textContent = "✕";
+    btnRemove.title = "Remove";
+    btnRemove.onclick = () => removeFromQueue(i);
+
+    div.append(thumb, titleEl, btnPlay, btnRemove);
+    list.appendChild(div);
+  });
+}
+
+function renderFavorites() {
+  const favs = getFavorites();
+  const list = document.getElementById("favoritesList");
+  if (favs.length === 0) {
+    list.innerHTML = '<span class="panel-empty">No favorites yet — star a video!</span>';
+    return;
+  }
+  list.innerHTML = "";
+  favs.forEach((fav, i) => {
+    const div = document.createElement("div");
+    div.className = "fav-item";
+
+    const thumb = document.createElement("img");
+    thumb.src = `https://img.youtube.com/vi/${fav.id}/default.jpg`;
+    thumb.alt = "";
+
+    const titleEl = document.createElement("span");
+    titleEl.className = "item-title";
+    titleEl.textContent = fav.title;
+    titleEl.title = fav.title;
+
+    const btnLoad = document.createElement("button");
+    btnLoad.className = "btn-small";
+    btnLoad.textContent = "▶";
+    btnLoad.title = "Play now";
+    btnLoad.onclick = () => loadFavorite(fav.id);
+
+    const btnQueue = document.createElement("button");
+    btnQueue.className = "btn-small";
+    btnQueue.textContent = "+Q";
+    btnQueue.title = "Add to queue";
+    btnQueue.onclick = () => queueFavorite(fav.id, fav.title);
+
+    const btnRemove = document.createElement("button");
+    btnRemove.className = "btn-small";
+    btnRemove.textContent = "✕";
+    btnRemove.title = "Remove from favorites";
+    btnRemove.onclick = () => removeFavorite(i);
+
+    div.append(thumb, titleEl, btnLoad, btnQueue, btnRemove);
+    list.appendChild(div);
+  });
+}
+
+// Render favorites from localStorage on load
+renderFavorites();
+
 
 // ------------------- CHAT ---------------------
 
@@ -256,13 +599,9 @@ function sendMessage() {
   const input = document.getElementById("chatInput");
   const msg = input.value.trim();
   if (!msg) return;
-
   socket.emit("chat_message", { user: username, text: msg });
-
   input.value = "";
 }
-
-
 
 socket.on("chat_message", (data) => {
   const { user, text } = data;
@@ -272,19 +611,20 @@ socket.on("chat_message", (data) => {
   const el = document.createElement("div");
   el.className = "message";
 
+  const safeText = escHtml(text);
+  const safeUser = escHtml(user);
+
   if (user === username) {
-    // YOU
     el.innerHTML = `
       <span style="color:#FFFF00;">[${time}]</span>
       <span style="color:#00FF00;"><b>You:</b></span>
-      <span style="color:#FFFFFF;">${text}</span>
+      <span style="color:#FFFFFF;">${safeText}</span>
     `;
   } else {
-    // FRIENDS
     el.innerHTML = `
       <span style="color:#FFFF00;">[${time}]</span>
-      <span style="color:#00FFEA;"><b>${user}:</b></span>
-      <span style="color:#FFFFFF;">${text}</span>
+      <span style="color:#00FFEA;"><b>${safeUser}:</b></span>
+      <span style="color:#FFFFFF;">${safeText}</span>
     `;
   }
 
@@ -292,7 +632,13 @@ socket.on("chat_message", (data) => {
   box.scrollTop = box.scrollHeight;
 });
 
-
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 </script>
 
 </body>
