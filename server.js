@@ -110,6 +110,11 @@ io.on("connection", (socket) => {
     io.emit("system_message", `▶ Now playing: "${next.title}"`);
   });
 
+  // Re-sync on demand (used by clients on reconnect / page visibility change)
+  socket.on("request_sync", () => {
+    socket.emit("sync_state", { ...getCurrentState(), queue });
+  });
+
   // Queue: manual skip to next
   socket.on("skip_video", (user) => {
     if (queue.length === 0) return;

@@ -2,7 +2,12 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000080">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Skåda på tv</title>
+  <link rel="manifest" href="/manifest.json">
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
 
@@ -126,6 +131,30 @@ button:hover {
 
 .btn-icon:hover {
   background: none !important;
+}
+
+/* ---- Connection dot ---- */
+#connDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00FF00;
+  vertical-align: middle;
+  margin-left: 8px;
+  box-shadow: 0 0 4px #00FF00;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+#connDot.disconnected {
+  background: #FF6600;
+  box-shadow: 0 0 4px #FF6600;
+  animation: connBlink 1s infinite;
+}
+
+@keyframes connBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
 /* ---- Now Playing ---- */
@@ -265,6 +294,7 @@ button:hover {
 <div id="userBar">
   Playing as: <span id="usernameDisplay"></span>
   <button class="btn-icon" id="renameBtn" onclick="editUsername()" title="Change name">✎</button>
+  <span id="connDot" title="Connected"></span>
 </div>
 
 <input id="videoInput" placeholder="Paste YouTube link or video ID" onkeydown="if(event.key==='Enter') loadVideo()">
@@ -335,9 +365,26 @@ function editUsername() {
 }
 
 
+// -------------------- SERVICE WORKER (PWA) --------------------
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").catch(() => {});
+}
+
+
 // -------------------- SOCKET --------------------------
 
 const socket = io({ transports: ["websocket"] });
+
+// Connection status dot
+function setConnected(connected) {
+  const dot = document.getElementById("connDot");
+  dot.title = connected ? "Connected" : "Reconnecting...";
+  dot.classList.toggle("disconnected", !connected);
+}
+
+socket.on("disconnect", () => setConnected(false));
+socket.on("connect", () => setConnected(true));
 
 socket.on("sync_state", (s) => {
   renderQueue(s.queue || []);
@@ -366,6 +413,7 @@ socket.on("play", (t) => {
   player.playVideo();
   lastState = YT.PlayerState.PLAYING;
   resetSuppress();
+  if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
 });
 
 socket.on("pause", (t) => {
@@ -374,6 +422,7 @@ socket.on("pause", (t) => {
   player.pauseVideo();
   lastState = YT.PlayerState.PAUSED;
   resetSuppress();
+  if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
 });
 
 socket.on("seek", (t) => {
@@ -384,6 +433,16 @@ socket.on("seek", (t) => {
 
 socket.on("system_message", (msg) => {
   appendSystemMessage(msg);
+});
+
+
+// -------------------- PAGE VISIBILITY --------------------
+
+// When the tab comes back into focus, request a fresh sync in case state drifted
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && socket.connected && player) {
+    socket.emit("request_sync");
+  }
 });
 
 
@@ -418,9 +477,11 @@ function applySync(s) {
   if (s.isPlaying) {
     player.playVideo();
     lastState = YT.PlayerState.PLAYING;
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
   } else {
     player.pauseVideo();
     lastState = YT.PlayerState.PAUSED;
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
   }
   resetSuppress();
   setNowPlaying(s.videoId);
@@ -493,6 +554,7 @@ function onStateChange(event) {
 
   if (s === YT.PlayerState.ENDED) {
     socket.emit("video_ended", currentVideoId);
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "none";
     return;
   }
 
@@ -501,8 +563,14 @@ function onStateChange(event) {
   lastState = s;
 
   const t = player.getCurrentTime();
-  if (s === YT.PlayerState.PLAYING) socket.emit("play", t);
-  if (s === YT.PlayerState.PAUSED) socket.emit("pause", t);
+  if (s === YT.PlayerState.PLAYING) {
+    socket.emit("play", t);
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
+  }
+  if (s === YT.PlayerState.PAUSED) {
+    socket.emit("pause", t);
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
+  }
 }
 
 function resetSuppress() {
@@ -522,9 +590,47 @@ async function setNowPlaying(id, { announce = false } = {}) {
   currentVideoTitle = title;
   document.getElementById("nowTitle").textContent = title;
   updateStarBtn();
+  updateMediaSession(title, id);
   if (announce) {
     socket.emit("system_message", `${username} loaded "${title}"`);
   }
+}
+
+// ---- MediaSession API — OS lock screen / notification controls ----
+function updateMediaSession(title, id) {
+  if (!("mediaSession" in navigator)) return;
+
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: title,
+    artist: "Skåda på tv",
+    artwork: [
+      { src: `https://img.youtube.com/vi/${id}/hqdefault.jpg`, sizes: "480x360", type: "image/jpeg" }
+    ]
+  });
+
+  navigator.mediaSession.setActionHandler("play", () => {
+    const t = player.getCurrentTime();
+    player.playVideo();
+    socket.emit("play", t);
+  });
+
+  navigator.mediaSession.setActionHandler("pause", () => {
+    const t = player.getCurrentTime();
+    player.pauseVideo();
+    socket.emit("pause", t);
+  });
+
+  navigator.mediaSession.setActionHandler("nexttrack", () => {
+    skipVideo();
+  });
+
+  // previoustrack — restart current video
+  navigator.mediaSession.setActionHandler("previoustrack", () => {
+    suppressEvents = true;
+    player.seekTo(0, true);
+    socket.emit("seek", 0);
+    resetSuppress();
+  });
 }
 
 async function fetchTitle(id) {
