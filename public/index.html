@@ -23,7 +23,7 @@ body {
 h1 {
   color: #FFFF00;
   text-shadow: 2px 2px #FF00FF;
-  font-size: 40px;
+  font-size: clamp(24px, 7vw, 40px);
   margin-bottom: 6px;
 }
 
@@ -49,16 +49,31 @@ button:hover {
   cursor: pointer;
 }
 
+/* ---- Responsive player wrapper ---- */
+#playerWrap {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  margin: 10px auto 0;
+  padding-bottom: min(56.25%, 360px); /* 16:9, capped at 360px on desktop */
+}
+
+#playerWrap > div, #playerWrap iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 #player {
   border: 5px double #FFFF00;
   box-shadow: 0 0 20px #FF00FF;
-  margin-top: 10px;
 }
 
 #chatBox {
   border: 4px ridge #00FFFF;
   background: rgba(0, 0, 0, 0.5);
-  width: 350px;
+  width: min(350px, 100%);
   height: 250px;
   margin: 0 auto;
   color: #00FFEA;
@@ -66,10 +81,11 @@ button:hover {
   padding: 10px;
   font-size: 14px;
   box-shadow: inset 0 0 10px #00FFFF;
+  box-sizing: border-box;
 }
 
 #chatInput {
-  width: 250px;
+  width: min(250px, 70%);
   background: #FFFFCC;
   color: black;
 }
@@ -187,9 +203,11 @@ button:hover {
 #panels {
   display: flex;
   gap: 15px;
-  width: 640px;
+  width: 100%;
+  max-width: 640px;
   margin: 15px auto 0;
   text-align: left;
+  box-sizing: border-box;
 }
 
 #queuePanel, #favoritesPanel {
@@ -285,6 +303,42 @@ button:hover {
   font-size: 13px;
   font-style: italic;
 }
+
+/* ---- Video input row ---- */
+#videoRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+#videoInput {
+  flex: 1 1 200px;
+  max-width: 400px;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* ---- Mobile breakpoint ---- */
+@media (max-width: 660px) {
+  body {
+    padding: 10px;
+  }
+
+  #panels {
+    flex-direction: column;
+  }
+
+  #queuePanel, #favoritesPanel {
+    max-height: 220px;
+  }
+
+  #videoInput {
+    width: 100%;
+    max-width: 100%;
+  }
+}
   </style>
 </head>
 <body>
@@ -297,16 +351,18 @@ button:hover {
   <span id="connDot" title="Connected"></span>
 </div>
 
-<input id="videoInput" placeholder="Paste YouTube link or video ID" onkeydown="if(event.key==='Enter') loadVideo()">
-<button onclick="loadVideo()">Load Video</button>
-<button onclick="addToQueue()">+ Queue</button>
+<div id="videoRow">
+  <input id="videoInput" placeholder="Paste YouTube link or video ID" onkeydown="if(event.key==='Enter') loadVideo()">
+  <button onclick="loadVideo()">Load Video</button>
+  <button onclick="addToQueue()">+ Queue</button>
+</div>
 
 <div id="nowPlaying">
   <span id="nowTitle" style="vertical-align:middle;">No video loaded</span>
   <button class="btn-icon" id="starBtn" onclick="toggleFavorite()" title="Toggle favorite">☆</button>
 </div>
 
-<div id="player"></div>
+<div id="playerWrap"><div id="player"></div></div>
 
 <div id="panels">
   <div id="queuePanel">
@@ -450,8 +506,8 @@ document.addEventListener("visibilitychange", () => {
 
 function onYouTubeIframeAPIReady() {
   player = new YT.Player("player", {
-    height: "360",
-    width: "640",
+    height: "100%",
+    width: "100%",
     videoId: "",
     playerVars: {
       autoplay: 0,
