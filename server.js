@@ -11,132 +11,156 @@ const io = new Server(server, {
   cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
-// Shared sync state
-let state = {
-  videoId: null,
-  time: 0,
-  isPlaying: false,
-  lastUpdate: Date.now()
-};
+// rooms[roomId] = { state, queue }
+const rooms = {};
 
-let queue = []; // Array of { id, title, addedBy }
+function getRoom(roomId) {
+  if (!rooms[roomId]) {
+    rooms[roomId] = {
+      state: { videoId: null, time: 0, isPlaying: false, lastUpdate: Date.now() },
+      queue: []
+    };
+  }
+  return rooms[roomId];
+}
+
+function getRoomState(room) {
+  let t = room.state.time;
+  if (room.state.isPlaying) {
+    t += (Date.now() - room.state.lastUpdate) / 1000;
+  }
+  return { ...room.state, time: t };
+}
 
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
+  let roomId = null;
 
-  // Send current state + queue to new client
-  socket.emit("sync_state", { ...getCurrentState(), queue });
-
-  // Chat message
-  socket.on("chat_message", (data) => {
-    io.emit("chat_message", data);
+  socket.on("join_room", (id) => {
+    if (typeof id !== "string" || !id) return;
+    roomId = id.slice(0, 20);
+    socket.join(roomId);
+    const room = getRoom(roomId);
+    socket.emit("sync_state", { ...getRoomState(room), queue: room.queue });
+    console.log(`${socket.id} joined room: ${roomId}`);
   });
 
-  // System/activity message (client-initiated, e.g. "User loaded a video")
-  socket.on("system_message", (msg) => {
-    if (typeof msg !== "string") return;
-    io.emit("system_message", msg);
+  socket.on("disconnect", () => {
+    if (!roomId) return;
+    const sockets = io.sockets.adapter.rooms.get(roomId);
+    if (!sockets || sockets.size === 0) {
+      delete rooms[roomId];
+      console.log("Room deleted (empty):", roomId);
+    }
   });
 
-  // Change video
-  socket.on("change_video", (videoId) => {
-    state.videoId = videoId;
-    state.time = 0;
-    state.isPlaying = false;
-    state.lastUpdate = Date.now();
-    socket.broadcast.emit("change_video", videoId);
-  });
+  const inRoom = () => roomId !== null;
 
-  // Play
-  socket.on("play", (time) => {
-    state.isPlaying = true;
-    state.time = time;
-    state.lastUpdate = Date.now();
-    socket.broadcast.emit("play", time);
-  });
-
-  // Pause
-  socket.on("pause", (time) => {
-    state.isPlaying = false;
-    state.time = time;
-    state.lastUpdate = Date.now();
-    socket.broadcast.emit("pause", time);
-  });
-
-  // Seek
-  socket.on("seek", (time) => {
-    state.time = time;
-    state.lastUpdate = Date.now();
-    socket.broadcast.emit("seek", time);
-  });
-
-  // Queue: add item
-  socket.on("add_to_queue", (item) => {
-    if (!item || !item.id) return;
-    const entry = {
-      id: item.id,
-      title: item.title || item.id,
-      addedBy: item.addedBy || "?"
-    };
-    queue.push(entry);
-    io.emit("queue_update", queue);
-    io.emit("system_message", `${entry.addedBy} added "${entry.title}" to the queue`);
-  });
-
-  // Queue: remove item by index
-  socket.on("remove_from_queue", (index) => {
-    if (index < 0 || index >= queue.length) return;
-    queue.splice(index, 1);
-    io.emit("queue_update", queue);
-  });
-
-  // Queue: clear all
-  socket.on("clear_queue", (user) => {
-    queue = [];
-    io.emit("queue_update", queue);
-    io.emit("system_message", `${user || "Someone"} cleared the queue`);
-  });
-
-  // Queue: advance when video ends — deduped by checking endedId matches current
-  socket.on("video_ended", (endedId) => {
-    if (endedId !== state.videoId || queue.length === 0) return;
-    const next = queue.shift();
-    state.videoId = next.id;
-    state.time = 0;
-    state.isPlaying = true;
-    state.lastUpdate = Date.now();
-    io.emit("change_video", next.id);
-    io.emit("queue_update", queue);
-    io.emit("system_message", `▶ Now playing: "${next.title}"`);
-  });
-
-  // Re-sync on demand (used by clients on reconnect / page visibility change)
   socket.on("request_sync", () => {
-    socket.emit("sync_state", { ...getCurrentState(), queue });
+    if (!inRoom()) return;
+    const room = getRoom(roomId);
+    socket.emit("sync_state", { ...getRoomState(room), queue: room.queue });
   });
 
-  // Queue: manual skip to next
+  socket.on("chat_message", (data) => {
+    if (!inRoom()) return;
+    io.to(roomId).emit("chat_message", data);
+  });
+
+  socket.on("system_message", (msg) => {
+    if (!inRoom() || typeof msg !== "string") return;
+    io.to(roomId).emit("system_message", msg);
+  });
+
+  socket.on("change_video", (videoId) => {
+    if (!inRoom()) return;
+    const room = getRoom(roomId);
+    room.state.videoId = videoId;
+    room.state.time = 0;
+    room.state.isPlaying = false;
+    room.state.lastUpdate = Date.now();
+    socket.broadcast.to(roomId).emit("change_video", videoId);
+  });
+
+  socket.on("play", (time) => {
+    if (!inRoom()) return;
+    const room = getRoom(roomId);
+    room.state.isPlaying = true;
+    room.state.time = time;
+    room.state.lastUpdate = Date.now();
+    socket.broadcast.to(roomId).emit("play", time);
+  });
+
+  socket.on("pause", (time) => {
+    if (!inRoom()) return;
+    const room = getRoom(roomId);
+    room.state.isPlaying = false;
+    room.state.time = time;
+    room.state.lastUpdate = Date.now();
+    socket.broadcast.to(roomId).emit("pause", time);
+  });
+
+  socket.on("seek", (time) => {
+    if (!inRoom()) return;
+    const room = getRoom(roomId);
+    room.state.time = time;
+    room.state.lastUpdate = Date.now();
+    socket.broadcast.to(roomId).emit("seek", time);
+  });
+
+  socket.on("add_to_queue", (item) => {
+    if (!inRoom() || !item || !item.id) return;
+    const room = getRoom(roomId);
+    const entry = { id: item.id, title: item.title || item.id, addedBy: item.addedBy || "?" };
+    room.queue.push(entry);
+    io.to(roomId).emit("queue_update", room.queue);
+    io.to(roomId).emit("system_message", `${entry.addedBy} added "${entry.title}" to the queue`);
+  });
+
+  socket.on("remove_from_queue", (index) => {
+    if (!inRoom()) return;
+    const room = getRoom(roomId);
+    if (index < 0 || index >= room.queue.length) return;
+    room.queue.splice(index, 1);
+    io.to(roomId).emit("queue_update", room.queue);
+  });
+
+  socket.on("clear_queue", (user) => {
+    if (!inRoom()) return;
+    const room = getRoom(roomId);
+    room.queue = [];
+    io.to(roomId).emit("queue_update", room.queue);
+    io.to(roomId).emit("system_message", `${user || "Someone"} cleared the queue`);
+  });
+
+  socket.on("video_ended", (endedId) => {
+    if (!inRoom()) return;
+    const room = getRoom(roomId);
+    if (endedId !== room.state.videoId || room.queue.length === 0) return;
+    const next = room.queue.shift();
+    room.state.videoId = next.id;
+    room.state.time = 0;
+    room.state.isPlaying = true;
+    room.state.lastUpdate = Date.now();
+    io.to(roomId).emit("change_video", next.id);
+    io.to(roomId).emit("queue_update", room.queue);
+    io.to(roomId).emit("system_message", `▶ Now playing: "${next.title}"`);
+  });
+
   socket.on("skip_video", (user) => {
-    if (queue.length === 0) return;
-    const next = queue.shift();
-    state.videoId = next.id;
-    state.time = 0;
-    state.isPlaying = true;
-    state.lastUpdate = Date.now();
-    io.emit("change_video", next.id);
-    io.emit("queue_update", queue);
-    io.emit("system_message", `${user || "Someone"} skipped to "${next.title}"`);
+    if (!inRoom()) return;
+    const room = getRoom(roomId);
+    if (room.queue.length === 0) return;
+    const next = room.queue.shift();
+    room.state.videoId = next.id;
+    room.state.time = 0;
+    room.state.isPlaying = true;
+    room.state.lastUpdate = Date.now();
+    io.to(roomId).emit("change_video", next.id);
+    io.to(roomId).emit("queue_update", room.queue);
+    io.to(roomId).emit("system_message", `${user || "Someone"} skipped to "${next.title}"`);
   });
 });
-
-function getCurrentState() {
-  let t = state.time;
-  if (state.isPlaying) {
-    const delta = (Date.now() - state.lastUpdate) / 1000;
-    t += delta;
-  }
-  return { ...state, time: t };
-}
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log("Server running on port", PORT));
