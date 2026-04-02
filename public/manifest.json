@@ -1,6 +1,6 @@
 {
-  "name": "Skåda på tv",
-  "short_name": "Skåda",
+  "name": "Skood på YouTube",
+  "short_name": "Skood",
   "description": "Watch YouTube together",
   "start_url": "/",
   "display": "standalone",
@@ -15,3 +15,4 @@
     }
   ]
 }
+  

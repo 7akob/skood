@@ -1,0 +1,324 @@
+* { box-sizing: border-box; }
+
+body {
+  background: #000080;
+  font-family: "Comic Sans MS", "Tahoma", sans-serif;
+  color: #00FFEA;
+  text-align: center;
+  padding: 20px;
+  margin: 0;
+}
+
+h1 {
+  color: #FFFF00;
+  text-shadow: 2px 2px #FF00FF;
+  font-size: clamp(24px, 7vw, 40px);
+  margin-bottom: 6px;
+}
+
+h2 {
+  color: #00FF00;
+  text-shadow: 1px 1px black;
+}
+
+input, button {
+  font-family: "Comic Sans MS", Arial;
+  font-size: 16px;
+  padding: 8px;
+  border: 3px solid #FF00FF;
+  background: linear-gradient(90deg, #00FFFF, #FF00FF);
+  color: black;
+  margin: 5px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 4px black;
+}
+
+button:hover {
+  background: linear-gradient(90deg, #FFFF00, #00FF00);
+  cursor: pointer;
+}
+
+.retro-divider {
+  margin: 20px auto;
+  width: 90%;
+  height: 5px;
+  background: repeating-linear-gradient(
+    45deg,
+    #FF00FF, #FF00FF 10px,
+    #00FFFF 10px, #00FFFF 20px
+  );
+  box-shadow: 0 0 10px #00FFFF;
+}
+
+/* ===================== LOBBY ===================== */
+#lobby {
+  max-width: 400px;
+  margin: 40px auto;
+}
+
+#lobbyBox {
+  border: 4px ridge #00FFFF;
+  background: rgba(0,0,0,0.5);
+  padding: 24px 20px;
+  box-shadow: 0 0 20px #00FFFF;
+}
+
+#lobbyBox h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.lobby-divider {
+  margin: 18px auto;
+  width: 80%;
+  height: 3px;
+  background: repeating-linear-gradient(
+    45deg,
+    #FF00FF, #FF00FF 8px,
+    #00FFFF 8px, #00FFFF 16px
+  );
+}
+
+#roomJoinInput {
+  width: min(200px, 100%);
+  background: #FFFFCC;
+  color: black;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 18px;
+  text-align: center;
+}
+
+/* ===================== APP ===================== */
+#app { display: none; }
+
+/* ---- Room bar ---- */
+#roomBar {
+  font-size: 13px;
+  color: #00FFEA;
+  margin-bottom: 6px;
+}
+
+#roomCodeDisplay {
+  color: #FFFF00;
+  font-weight: bold;
+  letter-spacing: 2px;
+  font-size: 15px;
+}
+
+/* ---- User bar ---- */
+#userBar {
+  font-size: 13px;
+  color: #00FFEA;
+  margin-bottom: 10px;
+}
+
+#usernameDisplay {
+  color: #FFFF00;
+  font-weight: bold;
+}
+
+.btn-icon {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  padding: 0 4px;
+  margin: 0;
+  vertical-align: middle;
+  line-height: 1;
+}
+.btn-icon:hover { background: none !important; }
+
+/* ---- Connection dot ---- */
+#connDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00FF00;
+  vertical-align: middle;
+  margin-left: 8px;
+  box-shadow: 0 0 4px #00FF00;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+#connDot.disconnected {
+  background: #FF6600;
+  box-shadow: 0 0 4px #FF6600;
+  animation: connBlink 1s infinite;
+}
+@keyframes connBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ---- Video input row ---- */
+#videoRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+#videoInput {
+  flex: 1 1 200px;
+  max-width: 400px;
+  min-width: 0;
+  background: #FFFFCC;
+  color: black;
+}
+
+/* ---- Now Playing ---- */
+#nowPlaying {
+  font-size: 15px;
+  color: #FFFF00;
+  margin: 8px 0 4px;
+  min-height: 24px;
+}
+
+#starBtn { font-size: 22px; color: #FFFF00; }
+#starBtn:hover { color: #FF00FF; }
+#renameBtn { font-size: 16px; color: #00FFEA; }
+#renameBtn:hover { color: #FF00FF; }
+
+/* ---- Responsive player wrapper ---- */
+#playerWrap {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  margin: 10px auto 0;
+  padding-bottom: min(56.25%, 360px);
+}
+#playerWrap > div, #playerWrap iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+#player {
+  border: 5px double #FFFF00;
+  box-shadow: 0 0 20px #FF00FF;
+}
+
+/* ---- Queue & Favorites panels ---- */
+#panels {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+  max-width: 640px;
+  margin: 15px auto 0;
+  text-align: left;
+}
+
+#queuePanel, #favoritesPanel {
+  flex: 1;
+  border: 3px ridge #00FFFF;
+  background: rgba(0,0,0,0.5);
+  padding: 10px;
+  box-shadow: 0 0 10px #00FFFF;
+  min-height: 120px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+#favoritesPanel {
+  border-color: #FF00FF;
+  box-shadow: 0 0 10px #FF00FF;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.panel-header h2 { margin: 0; font-size: 18px; }
+#favoritesPanel .panel-header h2 { color: #FF00FF; }
+
+.queue-item, .fav-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border-bottom: 1px dotted #00FFFF;
+}
+.fav-item { border-bottom-color: #FF00FF; }
+
+.queue-item img, .fav-item img {
+  width: 72px;
+  height: 54px;
+  object-fit: cover;
+  border: 1px solid #00FFFF;
+  flex-shrink: 0;
+}
+.fav-item img { border-color: #FF00FF; }
+
+.item-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.item-title {
+  color: #00FFEA;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.item-by { font-size: 10px; color: #777; font-style: italic; }
+
+.btn-small {
+  font-size: 11px !important;
+  padding: 2px 5px !important;
+  margin: 1px !important;
+  border-width: 2px !important;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.panel-empty { color: #555; font-size: 13px; font-style: italic; }
+
+/* ---- Chat ---- */
+#chatBox {
+  border: 4px ridge #00FFFF;
+  background: rgba(0,0,0,0.5);
+  width: min(350px, 100%);
+  height: 250px;
+  margin: 0 auto;
+  color: #00FFEA;
+  overflow-y: auto;
+  padding: 10px;
+  font-size: 14px;
+  box-shadow: inset 0 0 10px #00FFFF;
+}
+#chatInput {
+  width: min(250px, 70%);
+  background: #FFFFCC;
+  color: black;
+}
+
+.message {
+  padding: 4px;
+  margin: 2px 0;
+  border-bottom: 1px dotted #00FFFF;
+  font-family: "Comic Sans MS", Tahoma, sans-serif;
+  text-align: left;
+}
+.sys-message {
+  padding: 3px 4px;
+  margin: 2px 0;
+  border-bottom: 1px dotted #333;
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+  text-align: left;
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 660px) {
+  body { padding: 10px; }
+  #panels { flex-direction: column; }
+  #queuePanel, #favoritesPanel { max-height: 220px; }
+  #videoInput { width: 100%; max-width: 100%; }
+}
