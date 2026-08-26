@@ -12,6 +12,7 @@ let currentVideoId = null;
 let currentVideoTitle = null;
 let currentRoomId = null;
 let loopEnabled = false;
+let currentQueueLength = 0;
 
 // -------------------- USERNAME --------------------
 let username = localStorage.getItem("yt_username");
@@ -32,6 +33,7 @@ function editUsername() {
   username = trimmed;
   localStorage.setItem("yt_username", username);
   document.getElementById("usernameDisplay").textContent = username;
+  if (socket.connected && currentRoomId) socket.emit("update_username", username);
 }
 
 // -------------------- SOCKET --------------------
@@ -53,11 +55,12 @@ socket.on("disconnect", () => setConnected(false));
 socket.on("connect", () => {
   setConnected(true);
   // Re-join room on every connect/reconnect — server sends fresh sync_state in response
-  if (currentRoomId) socket.emit("join_room", currentRoomId);
+  if (currentRoomId) socket.emit("join_room", { roomId: currentRoomId, username });
 });
 
 socket.on("sync_state", (s) => {
   renderQueue(s.queue || []);
+  renderPresence(s.users || []);
   loopEnabled = !!s.loop;
   updateLoopBtn();
   if (!player) {
@@ -68,6 +71,7 @@ socket.on("sync_state", (s) => {
 });
 
 socket.on("queue_update", (q) => renderQueue(q));
+socket.on("presence_update", (users) => renderPresence(users));
 
 socket.on("loop_update", (loop) => {
   loopEnabled = loop;
@@ -133,11 +137,12 @@ function enterRoom(roomId) {
   document.getElementById("app").style.display = "block";
   renderFavorites();
   if (socket.connected) {
-    socket.emit("join_room", currentRoomId);
+    socket.emit("join_room", { roomId: currentRoomId, username });
   }
 }
 
 function leaveRoom() {
+  if (socket.connected && currentRoomId) socket.emit("leave_room");
   history.replaceState({}, "", "/");
   currentRoomId = null;
   pendingSync = null;
@@ -146,15 +151,35 @@ function leaveRoom() {
   document.getElementById("app").style.display = "none";
   document.getElementById("lobby").style.display = "block";
   document.getElementById("roomJoinInput").value = "";
+  renderPresence([]);
+}
+
+function renderPresence(users) {
+  const el = document.getElementById("presenceList");
+  if (!el) return;
+  el.textContent = users && users.length ? users.join(", ") : "just you";
 }
 
 function copyRoomLink() {
   const url = location.origin + "?room=" + currentRoomId;
   navigator.clipboard.writeText(url).then(() => {
     appendSystemMessage("Länk kopierad: " + url);
+    showCopiedTip();
   }).catch(() => {
     prompt("Kopiera länken:", url);
   });
+}
+
+function showCopiedTip() {
+  const btn = document.getElementById("copyLinkBtn");
+  if (!btn) return;
+  const existing = btn.querySelector(".copied-tip");
+  if (existing) existing.remove();
+  const tip = document.createElement("span");
+  tip.className = "copied-tip";
+  tip.textContent = "Kopierad!";
+  btn.appendChild(tip);
+  setTimeout(() => tip.remove(), 1400);
 }
 
 // Check URL on load — skip lobby if room param present
@@ -255,7 +280,11 @@ function playFromQueue(qid, id) {
 }
 
 function skipVideo() { socket.emit("skip_video", username); }
-function clearQueue() { socket.emit("clear_queue", username); }
+
+function clearQueue() {
+  if (currentQueueLength > 0 && !confirm(`Rensa kön (${currentQueueLength} videor)? Går inte att ångra.`)) return;
+  socket.emit("clear_queue", username);
+}
 
 // Loop is shared room state (like play/pause) — toggling it round-trips
 // through the server so everyone's button reflects the same on/off state.
@@ -397,9 +426,16 @@ function toggleFavorite() {
   updateStarBtn();
 }
 
+// Also toggles the replay button's disabled state — both need a
+// currentVideoId to do anything, so they share this update point.
 function updateStarBtn() {
-  const isFav = currentVideoId && getFavorites().some(f => f.id === currentVideoId);
-  document.getElementById("starBtn").textContent = isFav ? "★" : "☆";
+  const hasVideo = !!currentVideoId;
+  const isFav = hasVideo && getFavorites().some(f => f.id === currentVideoId);
+  const starBtn = document.getElementById("starBtn");
+  const replayBtn = document.getElementById("replayBtn");
+  starBtn.textContent = isFav ? "★" : "☆";
+  starBtn.disabled = !hasVideo;
+  replayBtn.disabled = !hasVideo;
 }
 
 // Personal per-browser watch counter: bumps a favorited video's play
@@ -437,6 +473,7 @@ function queueFavorite(id, title) {
 }
 
 function renderQueue(q) {
+  currentQueueLength = q.length;
   const list = document.getElementById("queueList");
   if (q.length === 0) {
     list.innerHTML = '<span class="panel-empty">Kön är tom</span>';

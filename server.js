@@ -19,10 +19,15 @@ function getRoom(roomId) {
   if (!rooms[roomId]) {
     rooms[roomId] = {
       state: { videoId: null, time: 0, isPlaying: false, lastUpdate: Date.now(), loop: false },
-      queue: []
+      queue: [],
+      users: {} // socket.id -> username, for the presence list
     };
   }
   return rooms[roomId];
+}
+
+function presenceList(room) {
+  return Object.values(room.users);
 }
 
 function getRoomState(room) {
@@ -36,31 +41,71 @@ function getRoomState(room) {
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
   let roomId = null;
+  let username = null;
 
-  socket.on("join_room", (id) => {
+  socket.on("join_room", (payload) => {
+    // Accept either the old bare-string shape or {roomId, username} —
+    // username is needed for the presence list and join/leave messages.
+    const id = typeof payload === "string" ? payload : payload && payload.roomId;
+    const name = (typeof payload === "object" && payload && payload.username) || "";
     if (typeof id !== "string" || !id) return;
     roomId = id.slice(0, 20);
+    username = (name || "?").toString().trim().slice(0, 20) || "?";
     socket.join(roomId);
     const room = getRoom(roomId);
-    socket.emit("sync_state", { ...getRoomState(room), queue: room.queue });
+    const wasAlreadyPresent = room.users[socket.id] === username;
+    room.users[socket.id] = username;
+    socket.emit("sync_state", { ...getRoomState(room), queue: room.queue, users: presenceList(room) });
+    if (!wasAlreadyPresent) {
+      socket.broadcast.to(roomId).emit("presence_update", presenceList(room));
+      socket.broadcast.to(roomId).emit("system_message", `${username} joined the room`);
+    }
     console.log(`${socket.id} joined room: ${roomId}`);
   });
 
-  socket.on("disconnect", () => {
-    if (!roomId) return;
-    const sockets = io.sockets.adapter.rooms.get(roomId);
-    if (!sockets || sockets.size === 0) {
-      delete rooms[roomId];
-      console.log("Room deleted (empty):", roomId);
-    }
+  socket.on("update_username", (name) => {
+    if (!roomId || typeof name !== "string") return;
+    const room = getRoom(roomId);
+    const trimmed = name.trim().slice(0, 20);
+    if (!trimmed || trimmed === username) return;
+    const old = username;
+    username = trimmed;
+    room.users[socket.id] = username;
+    io.to(roomId).emit("presence_update", presenceList(room));
+    io.to(roomId).emit("system_message", `${old} is now known as ${username}`);
   });
+
+  // Shared by an explicit "leave" and a dropped connection — removes this
+  // socket from the room's presence, deletes the room if that was the
+  // last person, otherwise tells whoever's left.
+  function leaveCurrentRoom() {
+    if (!roomId) return;
+    const room = rooms[roomId];
+    const leftId = roomId;
+    const leftName = username;
+    roomId = null;
+    if (!room) return;
+    delete room.users[socket.id];
+    socket.leave(leftId);
+    const sockets = io.sockets.adapter.rooms.get(leftId);
+    if (!sockets || sockets.size === 0) {
+      delete rooms[leftId];
+      console.log("Room deleted (empty):", leftId);
+    } else {
+      io.to(leftId).emit("presence_update", presenceList(room));
+      io.to(leftId).emit("system_message", `${leftName || "Someone"} left the room`);
+    }
+  }
+
+  socket.on("leave_room", leaveCurrentRoom);
+  socket.on("disconnect", leaveCurrentRoom);
 
   const inRoom = () => roomId !== null;
 
   socket.on("request_sync", () => {
     if (!inRoom()) return;
     const room = getRoom(roomId);
-    socket.emit("sync_state", { ...getRoomState(room), queue: room.queue });
+    socket.emit("sync_state", { ...getRoomState(room), queue: room.queue, users: presenceList(room) });
   });
 
   socket.on("chat_message", (data) => {

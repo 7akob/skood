@@ -38,7 +38,7 @@
 
   <div id="roomBar">
     Room: <span id="roomCodeDisplay"></span>
-    <button class="btn-icon" onclick="copyRoomLink()" title="Copy Link">🔗</button>
+    <button class="btn-icon" id="copyLinkBtn" onclick="copyRoomLink()" title="Copy Link">🔗</button>
     <button class="btn-icon" onclick="leaveRoom()" title="Leave Room" style="color:#FF6666;">✕</button>
   </div>
 
@@ -48,6 +48,8 @@
     <span id="connDot" title="Connected"></span>
   </div>
 
+  <div id="presenceBar">In room: <span id="presenceList">just you</span></div>
+
   <div id="videoRow">
     <input id="videoInput" placeholder="Paste YouTube link or video ID" onkeydown="if(event.key==='Enter') loadVideo()">
     <button onclick="loadVideo()">Load Video</button>
@@ -56,8 +58,8 @@
 
   <div id="nowPlaying">
     <span id="nowTitle" style="vertical-align:middle;">No video loaded</span>
-    <button class="btn-icon" id="starBtn" onclick="toggleFavorite()" title="Favorite">☆</button>
-    <button class="btn-icon" id="replayBtn" onclick="playAgain()" title="Play again (adds to queue)">↻</button>
+    <button class="btn-icon" id="starBtn" onclick="toggleFavorite()" title="Favorite" disabled>☆</button>
+    <button class="btn-icon" id="replayBtn" onclick="playAgain()" title="Play again (adds to queue)" disabled>↻</button>
   </div>
 
   <div id="playerWrap"><div id="player"></div></div>
