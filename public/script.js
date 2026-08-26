@@ -188,14 +188,19 @@ function onYouTubeIframeAPIReady() {
 function applySync(s) {
   if (!player || !s.videoId) return;
   suppressEvents = true;
-  player.loadVideoById(s.videoId);
-  player.seekTo(s.time, true);
+  // Pass the start time directly into load/cueVideoById instead of calling
+  // seekTo() right after loadVideoById(). seekTo() issued immediately after
+  // loadVideoById() races the player's async video load and is frequently
+  // dropped, silently landing a joining viewer at 0:00 instead of the
+  // host's actual position — this was the "not synced on join" bug.
   if (s.isPlaying) {
-    player.playVideo();
+    player.loadVideoById(s.videoId, s.time);
     lastState = YT.PlayerState.PLAYING;
     if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
   } else {
-    player.pauseVideo();
+    // cueVideoById loads+seeks without autoplaying, avoiding a play/pause
+    // flash for viewers who should stay paused.
+    player.cueVideoById(s.videoId, s.time);
     lastState = YT.PlayerState.PAUSED;
     if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
   }
