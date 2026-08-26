@@ -33,62 +33,12 @@ function editUsername() {
   document.getElementById("usernameDisplay").textContent = username;
 }
 
-// -------------------- ROOM LOBBY --------------------
-function generateRoomId() {
-  return Math.random().toString(36).slice(2, 8).toUpperCase();
-}
-
-function createRoom() {
-  enterRoom(generateRoomId());
-}
-
-function joinRoomFromInput() {
-  const val = document.getElementById("roomJoinInput").value.trim().toUpperCase();
-  if (!val) return;
-  enterRoom(val);
-}
-
-function enterRoom(roomId) {
-  currentRoomId = roomId;
-  history.replaceState({}, "", "?room=" + roomId);
-  document.getElementById("roomCodeDisplay").textContent = roomId;
-  document.getElementById("usernameDisplay").textContent = username;
-  document.getElementById("lobby").style.display = "none";
-  document.getElementById("app").style.display = "block";
-  renderFavorites();
-  if (socket.connected) {
-    socket.emit("join_room", currentRoomId);
-  }
-}
-
-function leaveRoom() {
-  history.replaceState({}, "", "/");
-  currentRoomId = null;
-  pendingSync = null;
-  currentVideoId = null;
-  currentVideoTitle = null;
-  document.getElementById("app").style.display = "none";
-  document.getElementById("lobby").style.display = "block";
-  document.getElementById("roomJoinInput").value = "";
-}
-
-function copyRoomLink() {
-  const url = location.origin + "?room=" + currentRoomId;
-  navigator.clipboard.writeText(url).then(() => {
-    appendSystemMessage("Länk kopierad: " + url);
-  }).catch(() => {
-    prompt("Kopiera länken:", url);
-  });
-}
-
-// Check URL on load — skip lobby if room param present
-(function () {
-  const params = new URLSearchParams(location.search);
-  const room = params.get("room");
-  if (room) enterRoom(room.toUpperCase());
-})();
-
 // -------------------- SOCKET --------------------
+// Must be created before ROOM LOBBY below: the auto-join-from-URL check
+// calls enterRoom(), which reads `socket` — if `socket` were declared
+// after that point, joining via a shared room link (?room=CODE) would
+// throw "Cannot access 'socket' before initialization" and abort the
+// rest of this script, leaving the page with no connection at all.
 const socket = io({ transports: ["websocket"] });
 
 function setConnected(connected) {
@@ -150,6 +100,61 @@ socket.on("seek", (t) => {
 
 socket.on("system_message", (msg) => appendSystemMessage(msg));
 socket.on("chat_message", (data) => renderChatMessage(data));
+
+// -------------------- ROOM LOBBY --------------------
+function generateRoomId() {
+  return Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
+function createRoom() {
+  enterRoom(generateRoomId());
+}
+
+function joinRoomFromInput() {
+  const val = document.getElementById("roomJoinInput").value.trim().toUpperCase();
+  if (!val) return;
+  enterRoom(val);
+}
+
+function enterRoom(roomId) {
+  currentRoomId = roomId;
+  history.replaceState({}, "", "?room=" + roomId);
+  document.getElementById("roomCodeDisplay").textContent = roomId;
+  document.getElementById("usernameDisplay").textContent = username;
+  document.getElementById("lobby").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  renderFavorites();
+  if (socket.connected) {
+    socket.emit("join_room", currentRoomId);
+  }
+}
+
+function leaveRoom() {
+  history.replaceState({}, "", "/");
+  currentRoomId = null;
+  pendingSync = null;
+  currentVideoId = null;
+  currentVideoTitle = null;
+  document.getElementById("app").style.display = "none";
+  document.getElementById("lobby").style.display = "block";
+  document.getElementById("roomJoinInput").value = "";
+}
+
+function copyRoomLink() {
+  const url = location.origin + "?room=" + currentRoomId;
+  navigator.clipboard.writeText(url).then(() => {
+    appendSystemMessage("Länk kopierad: " + url);
+  }).catch(() => {
+    prompt("Kopiera länken:", url);
+  });
+}
+
+// Check URL on load — skip lobby if room param present
+(function () {
+  const params = new URLSearchParams(location.search);
+  const room = params.get("room");
+  if (room) enterRoom(room.toUpperCase());
+})();
 
 // -------------------- PAGE VISIBILITY --------------------
 document.addEventListener("visibilitychange", () => {
