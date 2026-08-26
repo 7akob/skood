@@ -1,5 +1,6 @@
 const express = require("express");
 const http = require("http");
+const crypto = require("crypto");
 const { Server } = require("socket.io");
 
 const app = express();
@@ -77,7 +78,11 @@ io.on("connection", (socket) => {
     const room = getRoom(roomId);
     room.state.videoId = videoId;
     room.state.time = 0;
-    room.state.isPlaying = false;
+    // loadVideoById() autoplays on every client (loader and receivers
+    // alike), so the room really is playing at this point — marking it
+    // paused here made anyone who joined right after a video change get
+    // cued as paused while everyone already present was actually playing.
+    room.state.isPlaying = true;
     room.state.lastUpdate = Date.now();
     socket.broadcast.to(roomId).emit("change_video", videoId);
   });
@@ -111,17 +116,21 @@ io.on("connection", (socket) => {
   socket.on("add_to_queue", (item) => {
     if (!inRoom() || !item || !item.id) return;
     const room = getRoom(roomId);
-    const entry = { id: item.id, title: item.title || item.id, addedBy: item.addedBy || "?" };
+    const entry = { qid: crypto.randomUUID(), id: item.id, title: item.title || item.id, addedBy: item.addedBy || "?" };
     room.queue.push(entry);
     io.to(roomId).emit("queue_update", room.queue);
     io.to(roomId).emit("system_message", `${entry.addedBy} added "${entry.title}" to the queue`);
   });
 
-  socket.on("remove_from_queue", (index) => {
+  // Removal is keyed by qid (not array index) so two people acting on the
+  // queue at nearly the same time can't remove/play the wrong item after
+  // an earlier removal has shifted everyone else's indices.
+  socket.on("remove_from_queue", (qid) => {
     if (!inRoom()) return;
     const room = getRoom(roomId);
-    if (index < 0 || index >= room.queue.length) return;
-    room.queue.splice(index, 1);
+    const idx = room.queue.findIndex((q) => q.qid === qid);
+    if (idx === -1) return;
+    room.queue.splice(idx, 1);
     io.to(roomId).emit("queue_update", room.queue);
   });
 

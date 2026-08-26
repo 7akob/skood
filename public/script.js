@@ -176,7 +176,7 @@ function onYouTubeIframeAPIReady() {
       enablejsapi: 1,
       modestbranding: 1
     },
-    events: { onStateChange }
+    events: { onStateChange, onError: onPlayerError }
   });
 
   if (pendingSync) {
@@ -233,10 +233,10 @@ async function addToQueue() {
   input.value = "";
 }
 
-function removeFromQueue(index) { socket.emit("remove_from_queue", index); }
+function removeFromQueue(qid) { socket.emit("remove_from_queue", qid); }
 
-function playFromQueue(index, id) {
-  socket.emit("remove_from_queue", index);
+function playFromQueue(qid, id) {
+  socket.emit("remove_from_queue", qid);
   socket.emit("change_video", id);
   suppressEvents = true;
   player.loadVideoById(id);
@@ -250,10 +250,15 @@ function skipVideo() { socket.emit("skip_video", username); }
 function clearQueue() { socket.emit("clear_queue", username); }
 
 function extractId(str) {
-  const m1 = str.match(/v=([^&]+)/);
+  const m1 = str.match(/[?&]v=([^&]+)/);
   if (m1) return m1[1];
-  const m2 = str.match(/youtu\.be\/([^?]+)/);
+  const m2 = str.match(/youtu\.be\/([^?&]+)/);
   if (m2) return m2[1];
+  // Shorts / live / embed links don't carry a v= param — without this,
+  // the whole URL was passed to loadVideoById() as an "ID", which
+  // YouTube's player rejects with its own generic error screen.
+  const m3 = str.match(/\/(?:shorts|live|embed)\/([^?&]+)/);
+  if (m3) return m3[1];
   return str;
 }
 
@@ -283,6 +288,20 @@ function onStateChange(event) {
 }
 
 function resetSuppress() { setTimeout(() => suppressEvents = false, 300); }
+
+// Surfaces YouTube's player errors in chat instead of leaving a silent
+// dead embed — e.g. removed/private videos or embedding disabled by the
+// uploader (error codes per the IFrame API docs).
+function onPlayerError(event) {
+  const messages = {
+    2: "Ogiltig video-länk.",
+    5: "Videon kan inte spelas upp i den här spelaren.",
+    100: "Videon hittades inte (borttagen eller privat).",
+    101: "Ägaren tillåter inte att videon spelas på andra sidor.",
+    150: "Ägaren tillåter inte att videon spelas på andra sidor."
+  };
+  appendSystemMessage("⚠ " + (messages[event.data] || "Videon kunde inte laddas."));
+}
 
 // -------------------- NOW PLAYING + FAVORITES --------------------
 async function setNowPlaying(id, { announce = false } = {}) {
@@ -382,7 +401,7 @@ function renderQueue(q) {
     return;
   }
   list.innerHTML = "";
-  q.forEach((item, i) => {
+  q.forEach((item) => {
     const div = document.createElement("div");
     div.className = "queue-item";
 
@@ -408,13 +427,13 @@ function renderQueue(q) {
     btnPlay.className = "btn-small";
     btnPlay.textContent = "▶";
     btnPlay.title = "Spela nu";
-    btnPlay.onclick = () => playFromQueue(i, item.id);
+    btnPlay.onclick = () => playFromQueue(item.qid, item.id);
 
     const btnRemove = document.createElement("button");
     btnRemove.className = "btn-small";
     btnRemove.textContent = "✕";
     btnRemove.title = "Ta bort";
-    btnRemove.onclick = () => removeFromQueue(i);
+    btnRemove.onclick = () => removeFromQueue(item.qid);
 
     div.append(thumb, meta, btnPlay, btnRemove);
     list.appendChild(div);
