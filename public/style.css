@@ -181,6 +181,14 @@ button:hover {
 #starBtn:hover { color: #FF00FF; }
 #renameBtn { font-size: 16px; color: #00FFEA; }
 #renameBtn:hover { color: #FF00FF; }
+#replayBtn { font-size: 20px; color: #00FFEA; }
+#replayBtn:hover { color: #FF00FF; }
+
+/* ---- Loop toggle (active = shared room state, on for everyone) ---- */
+#loopBtn.active {
+  background: linear-gradient(90deg, #FFFF00, #00FF00) !important;
+  box-shadow: 0 0 6px #00FF00 !important;
+}
 
 /* ---- Responsive player wrapper ---- */
 #playerWrap {

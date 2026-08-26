@@ -18,7 +18,7 @@ const rooms = {};
 function getRoom(roomId) {
   if (!rooms[roomId]) {
     rooms[roomId] = {
-      state: { videoId: null, time: 0, isPlaying: false, lastUpdate: Date.now() },
+      state: { videoId: null, time: 0, isPlaying: false, lastUpdate: Date.now(), loop: false },
       queue: []
     };
   }
@@ -134,6 +134,13 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("queue_update", room.queue);
   });
 
+  socket.on("toggle_loop", () => {
+    if (!inRoom()) return;
+    const room = getRoom(roomId);
+    room.state.loop = !room.state.loop;
+    io.to(roomId).emit("loop_update", room.state.loop);
+  });
+
   socket.on("clear_queue", (user) => {
     if (!inRoom()) return;
     const room = getRoom(roomId);
@@ -145,7 +152,27 @@ io.on("connection", (socket) => {
   socket.on("video_ended", (endedId) => {
     if (!inRoom()) return;
     const room = getRoom(roomId);
-    if (endedId !== room.state.videoId || room.queue.length === 0) return;
+    if (endedId !== room.state.videoId) return;
+
+    if (room.state.loop) {
+      // Everyone in the room independently detects ENDED and emits this,
+      // so a duplicate for the same play-through arrives moments later.
+      // Unlike the non-loop path, videoId doesn't change on replay, so it
+      // can't be used to dedupe — guard on how recently we last restarted
+      // instead (a real video can't end again within 1.5s of restarting).
+      // Tracked separately from state.lastUpdate, which other actions
+      // (change_video, play, pause, seek) also touch and would otherwise
+      // cause an unrelated recent action to wrongly suppress a real replay.
+      if (Date.now() - (room.lastLoopRestart || 0) < 1500) return;
+      room.lastLoopRestart = Date.now();
+      room.state.time = 0;
+      room.state.isPlaying = true;
+      room.state.lastUpdate = Date.now();
+      io.to(roomId).emit("change_video", room.state.videoId);
+      return;
+    }
+
+    if (room.queue.length === 0) return;
     const next = room.queue.shift();
     room.state.videoId = next.id;
     room.state.time = 0;

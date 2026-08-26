@@ -11,6 +11,7 @@ let pendingSync = null;
 let currentVideoId = null;
 let currentVideoTitle = null;
 let currentRoomId = null;
+let loopEnabled = false;
 
 // -------------------- USERNAME --------------------
 let username = localStorage.getItem("yt_username");
@@ -57,6 +58,8 @@ socket.on("connect", () => {
 
 socket.on("sync_state", (s) => {
   renderQueue(s.queue || []);
+  loopEnabled = !!s.loop;
+  updateLoopBtn();
   if (!player) {
     pendingSync = s;
   } else {
@@ -65,6 +68,11 @@ socket.on("sync_state", (s) => {
 });
 
 socket.on("queue_update", (q) => renderQueue(q));
+
+socket.on("loop_update", (loop) => {
+  loopEnabled = loop;
+  updateLoopBtn();
+});
 
 socket.on("change_video", (id) => {
   suppressEvents = true;
@@ -249,6 +257,22 @@ function playFromQueue(qid, id) {
 function skipVideo() { socket.emit("skip_video", username); }
 function clearQueue() { socket.emit("clear_queue", username); }
 
+// Loop is shared room state (like play/pause) — toggling it round-trips
+// through the server so everyone's button reflects the same on/off state.
+function toggleLoop() { socket.emit("toggle_loop"); }
+
+function updateLoopBtn() {
+  const btn = document.getElementById("loopBtn");
+  if (!btn) return;
+  btn.classList.toggle("active", loopEnabled);
+  btn.title = loopEnabled ? "Upprepning: PÅ" : "Upprepa nuvarande video";
+}
+
+function playAgain() {
+  if (!currentVideoId) return;
+  socket.emit("add_to_queue", { id: currentVideoId, title: currentVideoTitle || currentVideoId, addedBy: username });
+}
+
 function extractId(str) {
   const m1 = str.match(/[?&]v=([^&]+)/);
   if (m1) return m1[1];
@@ -309,6 +333,7 @@ async function setNowPlaying(id, { announce = false } = {}) {
   currentVideoTitle = null;
   document.getElementById("nowTitle").textContent = "Laddar...";
   updateStarBtn();
+  bumpFavoritePlayCount(id);
   const title = await fetchTitle(id);
   if (currentVideoId !== id) return;
   currentVideoTitle = title;
@@ -360,8 +385,13 @@ function toggleFavorite() {
   if (!currentVideoId) return;
   const favs = getFavorites();
   const idx = favs.findIndex(f => f.id === currentVideoId);
-  if (idx >= 0) favs.splice(idx, 1);
-  else favs.unshift({ id: currentVideoId, title: currentVideoTitle || currentVideoId });
+  if (idx >= 0) {
+    favs.splice(idx, 1);
+  } else {
+    // Seed with 1 play since you're favoriting it while it's already
+    // playing — bumpFavoritePlayCount() only fires on future plays.
+    favs.unshift({ id: currentVideoId, title: currentVideoTitle || currentVideoId, plays: 1 });
+  }
   saveFavorites(favs);
   renderFavorites();
   updateStarBtn();
@@ -370,6 +400,18 @@ function toggleFavorite() {
 function updateStarBtn() {
   const isFav = currentVideoId && getFavorites().some(f => f.id === currentVideoId);
   document.getElementById("starBtn").textContent = isFav ? "★" : "☆";
+}
+
+// Personal per-browser watch counter: bumps a favorited video's play
+// count every time it becomes the now-playing video for you, regardless
+// of who in the room loaded it. Non-favorites aren't tracked.
+function bumpFavoritePlayCount(id) {
+  const favs = getFavorites();
+  const fav = favs.find(f => f.id === id);
+  if (!fav) return;
+  fav.plays = (fav.plays || 0) + 1;
+  saveFavorites(favs);
+  renderFavorites();
 }
 
 function removeFavorite(index) {
@@ -464,7 +506,12 @@ function renderFavorites() {
     titleEl.textContent = fav.title;
     titleEl.title = fav.title;
 
-    meta.append(titleEl);
+    const playsEl = document.createElement("span");
+    playsEl.className = "item-by";
+    const plays = fav.plays || 0;
+    playsEl.textContent = plays === 1 ? "spelad 1 gång" : `spelad ${plays} gånger`;
+
+    meta.append(titleEl, playsEl);
 
     const btnLoad = document.createElement("button");
     btnLoad.className = "btn-small";

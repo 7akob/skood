@@ -57,6 +57,7 @@
   <div id="nowPlaying">
     <span id="nowTitle" style="vertical-align:middle;">No video loaded</span>
     <button class="btn-icon" id="starBtn" onclick="toggleFavorite()" title="Favorite">☆</button>
+    <button class="btn-icon" id="replayBtn" onclick="playAgain()" title="Play again (adds to queue)">↻</button>
   </div>
 
   <div id="playerWrap"><div id="player"></div></div>
@@ -66,6 +67,7 @@
       <div class="panel-header">
         <h2>Queue</h2>
         <div>
+          <button class="btn-small" id="loopBtn" onclick="toggleLoop()" title="Loop current video">🔁</button>
           <button class="btn-small" onclick="skipVideo()" title="Skip to next">⏭ Skip</button>
           <button class="btn-small" onclick="clearQueue()" title="Clear Queue">Clear</button>
         </div>
