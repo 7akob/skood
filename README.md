@@ -102,5 +102,5 @@ Bug reports, small PRs, and new themes are very welcome — see [CONTRIBUTING.md
 Skood is free and always will be. If it made your movie night better:
 
 - ⭐ star the repo — it genuinely helps people find it
-- ☕ *Buy Me a Coffee — coming soon*
+- ☕ [buy me a coffee](https://buymeacoffee.com/7akob)
 - 👋 check out my other projects at [github.com/7akob](https://github.com/7akob)
