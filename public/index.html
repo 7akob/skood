@@ -30,32 +30,43 @@
 <!-- ===================== LOBBY ===================== -->
 <div id="lobby">
   <h1><span class="logo-sk">Sk</span><span class="logo-badge">ood</span><span class="logo-tagline">watch together</span></h1>
+
+  <div id="lobbyBar">
+    Theme:
+    <select class="theme-select" onchange="changeTheme(this.value)">
+      <option value="yt2008">Classic 2008</option>
+      <option value="neon90s">Neon 90s</option>
+      <option value="midnight">Midnight</option>
+    </select>
+  </div>
+
+  <div id="lobbyNav">
+    <span class="nav-tab">Home</span>
+    <span id="lobbyStats" class="lobby-stats"></span>
+  </div>
+
   <div id="lobbyBox">
     <div class="lobby-name">
       You are <input id="nameInput" maxlength="20" onchange="commitLobbyName()" onblur="commitLobbyName()">
     </div>
 
-    <h2>Create Room</h2>
-    <button onclick="createRoom()">New Room</button>
+    <div class="lobby-panels">
+      <div class="lobby-panel">
+        <div class="panel-header"><h2>Create a room</h2></div>
+        <p class="lobby-hint">Start a room and send the link to whoever you want to watch with. There is nothing to sign up for.</p>
+        <button onclick="createRoom()">New Room</button>
+      </div>
 
-    <div class="lobby-divider"></div>
+      <div class="lobby-divider"></div>
 
-    <h2>Join Room</h2>
-    <input id="roomJoinInput" placeholder="Room Code" maxlength="8"
-           onkeydown="if(event.key==='Enter') joinRoomFromInput()">
-    <br>
-    <button onclick="joinRoomFromInput()">Join Room</button>
-
-    <div class="lobby-theme">
-      Theme:
-      <select class="theme-select" onchange="changeTheme(this.value)">
-        <option value="yt2008">Classic 2008</option>
-        <option value="neon90s">Neon 90s</option>
-        <option value="midnight">Midnight</option>
-      </select>
+      <div class="lobby-panel">
+        <div class="panel-header"><h2>Join a room</h2></div>
+        <p class="lobby-hint">Got a room code from a friend? Type it in here.</p>
+        <input id="roomJoinInput" placeholder="Room Code" maxlength="8"
+               onkeydown="if(event.key==='Enter') joinRoomFromInput()">
+        <button onclick="joinRoomFromInput()">Join Room</button>
+      </div>
     </div>
-
-    <div id="lobbyStats" class="lobby-stats"></div>
   </div>
 </div>
 
@@ -96,7 +107,16 @@
     <button class="btn-icon" id="replayBtn" onclick="playAgain()" title="Play again (adds to queue)" disabled>↻</button>
   </div>
 
-  <div id="playerWrap"><div id="player"></div></div>
+  <div id="playerWrap">
+    <div id="player"></div>
+    <div id="playerError" hidden>
+      <span class="error-face" aria-hidden="true"></span>
+      <span class="error-text">
+        <span id="playerErrorMsg"></span>
+        <span class="error-sub">Sorry about that.</span>
+      </span>
+    </div>
+  </div>
 
   <div id="panels">
     <div id="queuePanel">
@@ -127,33 +147,34 @@
     <button onclick="sendMessage()">Send</button>
   </div>
 
-  <!-- Period chrome below: the Classic 2008 theme lays these out, the other
-       themes hide them. Grid areas place them, so DOM order stays fixed. -->
+  <!-- Period chrome: the Classic 2008 theme lays this out, the other themes
+       hide it. A grid area places it, so DOM order stays fixed. -->
   <div id="shareBox">
     <span class="share-label">Share:</span>
     <input id="shareUrl" readonly onclick="this.select()">
     <button class="btn-small" onclick="copyRoomLink()">Copy</button>
   </div>
 
-  <div id="siteFooter">
-    <div class="footer-col">
-      <strong>Skood</strong>
-      <a href="https://github.com/7akob/skood">Source</a>
-      <a href="https://github.com/7akob/skood#readme">About</a>
-    </div>
-    <div class="footer-col">
-      <strong>Help</strong>
-      <a href="https://github.com/7akob/skood/issues/new?template=bug_report.yml">Report a bug</a>
-      <a href="https://github.com/7akob/skood/blob/main/CONTRIBUTING.md">Contribute</a>
-    </div>
-    <div class="footer-col">
-      <strong>Project</strong>
-      <a href="https://github.com/7akob/skood/issues">Ideas</a>
-      <a href="https://buymeacoffee.com/7akob">Support the server</a>
-    </div>
-    <div class="footer-note">Skood is free and open source. Not affiliated with YouTube.</div>
-  </div>
+</div>
 
+<!-- Sits outside both screens so the lobby and the room share one footer -->
+<div id="siteFooter">
+  <div class="footer-col">
+    <strong>Skood</strong>
+    <a href="https://github.com/7akob/skood">Source</a>
+    <a href="https://github.com/7akob/skood#readme">About</a>
+  </div>
+  <div class="footer-col">
+    <strong>Help</strong>
+    <a href="https://github.com/7akob/skood/issues/new?template=bug_report.yml">Report a bug</a>
+    <a href="https://github.com/7akob/skood/blob/main/CONTRIBUTING.md">Contribute</a>
+  </div>
+  <div class="footer-col">
+    <strong>Project</strong>
+    <a href="https://github.com/7akob/skood/issues">Ideas</a>
+    <a href="https://buymeacoffee.com/7akob">Support the server</a>
+  </div>
+  <div class="footer-note">Skood is free and open source. Not affiliated with YouTube.</div>
 </div>
 
 <script src="script.js"></script>

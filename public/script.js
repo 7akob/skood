@@ -474,13 +474,30 @@ function resetSuppress() { setTimeout(() => suppressEvents = false, 300); }
 // uploader (error codes per the IFrame API docs).
 function onPlayerError(event) {
   const messages = {
-    2: "Invalid video link.",
+    2: "That video link doesn't look right.",
     5: "This video can't be played in this player.",
-    100: "Video not found (removed or private).",
-    101: "The owner doesn't allow this video to be played on other sites.",
-    150: "The owner doesn't allow this video to be played on other sites."
+    100: "This video is no longer available. It was removed or made private.",
+    101: "This video is not available here, because the owner doesn't allow it to be played on other sites.",
+    150: "This video is not available here, because the owner doesn't allow it to be played on other sites."
   };
-  appendSystemMessage("⚠ " + (messages[event.data] || "The video couldn't be loaded."));
+  const message = messages[event.data] || "This video couldn't be loaded.";
+  appendSystemMessage("⚠ " + message);
+  showPlayerError(message);
+}
+
+// A refused video otherwise leaves a silent black embed, with the reason
+// buried in chat. Put it over the player where people are already looking.
+function showPlayerError(message) {
+  const box = document.getElementById("playerError");
+  const text = document.getElementById("playerErrorMsg");
+  if (!box || !text) return;
+  text.textContent = message;
+  box.hidden = false;
+}
+
+function clearPlayerError() {
+  const box = document.getElementById("playerError");
+  if (box) box.hidden = true;
 }
 
 // -------------------- NOW PLAYING + FAVORITES --------------------
@@ -488,6 +505,7 @@ async function setNowPlaying(id, { announce = false } = {}) {
   currentVideoId = id;
   currentVideoTitle = null;
   sessionPlayed.add(id);
+  clearPlayerError();
   document.getElementById("nowTitle").textContent = "Loading...";
   updateStarBtn();
   bumpFavoritePlayCount(id);

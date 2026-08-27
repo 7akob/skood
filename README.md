@@ -121,7 +121,7 @@ The "no tracking" claim is verifiable, since the code is one sitting long. The f
 Unlikely. Skood is a plain, by-the-book embed. It uses the official YouTube IFrame Player API, and every viewer streams directly from YouTube in their own player: views count, region rules apply, and YouTube's own embed behavior is untouched. Nothing is proxied, downloaded or stripped, so there is nothing to crack down on.
 
 **Why do some videos refuse to play ("not allowed on other sites")?**
-The uploader or their label disabled embedding for that video. It affects every embed on the web equally. Skood just tells you in chat instead of showing a silently dead player.
+The uploader or their label disabled embedding for that video. It affects every embed on the web equally. Skood says so over the player, and in chat, instead of leaving a dead black box.
 
 **Everyone drifted apart for a moment. Why?**
 If YouTube serves one viewer an ad inside the embed, that person's clock differs until it ends. A pause and play from anyone, or refocusing the tab, resyncs the room.

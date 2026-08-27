@@ -439,6 +439,34 @@ button:hover {
   font-size: 12px;
   vertical-align: middle;
 }
+/* Lobby chrome. These defaults are deliberately plain: the Classic 2008
+   theme builds a masthead and nav strip out of them further down, and the
+   other themes are happy with the plain version. */
+#lobbyBar {
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+#lobbyNav {
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.nav-tab { display: none; }
+.lobby-hint {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+/* Plain by default so the negative-margin module bar can't escape a panel
+   that has no padding. The 2008 theme turns it back into a module bar. */
+.lobby-panel .panel-header {
+  margin: 0 0 8px;
+  padding: 0;
+  background: none;
+  border-bottom: none;
+}
+
 .lobby-name {
   margin-bottom: 16px;
   font-size: 13px;
@@ -575,6 +603,59 @@ button:hover {
 #player {
   border: var(--player-border);
   box-shadow: var(--player-glow);
+}
+
+/* Shown when YouTube refuses to play something, instead of leaving a silent
+   dead embed. Dark in every theme, the way a stopped player always is. */
+#playerError {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(#2B2B2B, #131313);
+  color: #FFFFFF;
+  font-size: 15px;
+  line-height: 1.4;
+  text-align: left;
+}
+#playerError[hidden] { display: none; }
+.error-text { display: block; max-width: 320px; }
+.error-sub {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #9A9A9A;
+}
+.error-face {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 42px;
+  border-radius: 10px;
+  background: #5A5A5A;
+}
+.error-face::before {
+  content: "";
+  position: absolute;
+  top: 13px;
+  left: 14px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 15px 0 0 #FFFFFF;
+}
+.error-face::after {
+  content: "";
+  position: absolute;
+  bottom: 11px;
+  left: 13px;
+  width: 24px;
+  height: 3px;
+  border-radius: 2px;
+  background: #FFFFFF;
+  transform: rotate(-7deg);
 }
 
 /* ---- Queue & Favorites panels ---- */
@@ -730,8 +811,7 @@ html[data-theme="yt2008"] #app.active {
     "share  share   side"
     "chathd chathd  side"
     "chat   chat    side"
-    "chatfm chatfm  side"
-    "footer footer  footer";
+    "chatfm chatfm  side";
   gap: 0;
 }
 
@@ -747,8 +827,90 @@ html[data-theme="yt2008"] #chatHead { grid-area: chathd; }
 html[data-theme="yt2008"] #chatBox { grid-area: chat; }
 html[data-theme="yt2008"] #chatForm { grid-area: chatfm; }
 html[data-theme="yt2008"] #panels { grid-area: side; align-self: start; }
-html[data-theme="yt2008"] #siteFooter { grid-area: footer; }
 html[data-theme="yt2008"] #app .retro-divider { display: none; }
+
+/* ---- Lobby: same masthead and nav strip, then a two-module split ---- */
+html[data-theme="yt2008"] #lobby {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "logo bar"
+    "nav  nav"
+    "box  box";
+  gap: 0;
+  max-width: 960px; /* one fixed page width, same as the room and the footer */
+  margin: 0 auto;
+  text-align: left;
+}
+html[data-theme="yt2008"] #lobby h1 { grid-area: logo; }
+html[data-theme="yt2008"] #lobbyBar { grid-area: bar; }
+html[data-theme="yt2008"] #lobbyNav { grid-area: nav; }
+html[data-theme="yt2008"] #lobbyBox { grid-area: box; }
+
+html[data-theme="yt2008"] #lobby h1,
+html[data-theme="yt2008"] #lobbyBar {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 10px 8px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #CCCCCC;
+}
+html[data-theme="yt2008"] #lobby h1 { padding-left: 0; font-size: 21px; }
+html[data-theme="yt2008"] #lobbyBar {
+  justify-content: flex-end;
+  gap: 5px;
+  font-size: 11px;
+  color: #666666;
+}
+
+html[data-theme="yt2008"] #lobbyNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 6px 10px;
+  background: linear-gradient(#FBFBFB, #EBEBEB);
+  border-bottom: 1px solid #CCCCCC;
+  font-size: 12px;
+}
+html[data-theme="yt2008"] .nav-tab {
+  display: inline-block;
+  font-weight: bold;
+  color: #333333;
+}
+
+html[data-theme="yt2008"] #lobbyBox {
+  border: none;
+  background: none;
+  box-shadow: none;
+  padding: 20px 0 0;
+}
+html[data-theme="yt2008"] .lobby-name { margin-bottom: 18px; color: #333333; }
+html[data-theme="yt2008"] #nameInput { text-align: left; }
+html[data-theme="yt2008"] .lobby-panels { display: flex; gap: 16px; }
+html[data-theme="yt2008"] .lobby-panel {
+  flex: 1;
+  padding: 10px;
+  background: #FFFFFF;
+  border: 1px solid #CCCCCC;
+}
+html[data-theme="yt2008"] .lobby-panel .panel-header {
+  margin: -10px -10px 10px;
+  padding: 5px 10px;
+  background: var(--panel-head-bg);
+  border-bottom: 1px solid #CCCCCC;
+}
+html[data-theme="yt2008"] #lobbyBox .panel-header h2 { margin: 0; font-size: 13px; }
+html[data-theme="yt2008"] .lobby-hint { min-height: 46px; color: #666666; }
+html[data-theme="yt2008"] .lobby-divider { display: none; }
+html[data-theme="yt2008"] #roomJoinInput {
+  display: block;
+  width: 100%;
+  margin: 0 0 8px;
+  text-align: left;
+  font-size: 15px;
+}
 
 /* ---- Masthead: three cells with no column gap, so they read as one bar ---- */
 html[data-theme="yt2008"] #app > h1,
@@ -906,7 +1068,8 @@ html[data-theme="yt2008"] #siteFooter {
   display: flex;
   flex-wrap: wrap;
   gap: 10px 32px;
-  margin-top: 24px;
+  max-width: 960px;
+  margin: 24px auto 0;
   padding: 14px 10px;
   background: #F7F7F7;
   border-top: 1px solid #CCCCCC;
@@ -1057,9 +1220,14 @@ html[data-theme="midnight"] .sys-message {
       "side"
       "chathd"
       "chat"
-      "chatfm"
-      "footer";
+      "chatfm";
   }
+  html[data-theme="yt2008"] #lobby {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "logo" "bar" "nav" "box";
+  }
+  html[data-theme="yt2008"] #lobbyBar { justify-content: flex-start; }
+  html[data-theme="yt2008"] .lobby-panels { flex-direction: column; }
   html[data-theme="yt2008"] #videoInput { max-width: 100%; }
   html[data-theme="yt2008"] #videoRow { flex-wrap: wrap; }
   html[data-theme="yt2008"] #userBar { justify-content: flex-start; }
