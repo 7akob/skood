@@ -3,6 +3,33 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
+// -------------------- THEME --------------------
+// The head snippet in index.html already set data-theme before first paint;
+// this re-apply exists to sync the selects and the meta theme-color.
+// The default theme name lives here AND in that snippet — change both together.
+const THEMES = ["yt2008", "neon90s"];
+function getTheme() {
+  try {
+    const t = localStorage.getItem("yt_theme");
+    return THEMES.includes(t) ? t : "neon90s";
+  } catch { return "neon90s"; }
+}
+function saveTheme(t) {
+  try { localStorage.setItem("yt_theme", t); } catch {}
+}
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", t === "neon90s" ? "#000080" : "#FFFFFF");
+  document.querySelectorAll(".theme-select").forEach((s) => { s.value = t; });
+}
+function changeTheme(t) {
+  if (!THEMES.includes(t)) return;
+  saveTheme(t);
+  applyTheme(t);
+}
+applyTheme(getTheme());
+
 // -------------------- STATE --------------------
 let player;
 let suppressEvents = false;
