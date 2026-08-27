@@ -297,10 +297,28 @@ function applySync(s) {
   setNowPlaying(s.videoId);
 }
 
-function loadVideo() {
+// A video that has run to the end with nothing queued behind it leaves the
+// room idle, so treat that as free rather than busy. Otherwise pasting a link
+// after the last video would queue it with nothing left to advance the queue.
+function roomIsWatching() {
+  if (!currentVideoId) return false;
+  if (!player || typeof player.getPlayerState !== "function") return true;
+  return player.getPlayerState() !== YT.PlayerState.ENDED;
+}
+
+// The button people reach for most should not be the destructive one. If the
+// room is watching something, a pasted link joins the queue instead of
+// replacing what is on screen. Interrupting is still possible, but only
+// through actions that are deliberate and announced in chat: a queue item's
+// play button, or Skip.
+async function loadVideo() {
   const input = document.getElementById("videoInput");
   const val = input.value.trim();
   if (!val) return;
+  if (roomIsWatching()) {
+    await addToQueue();
+    return;
+  }
   const id = extractId(val);
   socket.emit("change_video", id);
   suppressEvents = true;

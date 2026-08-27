@@ -36,6 +36,7 @@ What "the opposite" means in practice:
 - Synced playback: play, pause and seek follow everyone in the room. The server keeps the authoritative position, so late joiners land exactly where the room is instead of at 0:00.
 - Shareable rooms: six-character codes and `?room=CODE` deep links with one-click copy.
 - Shared queue with thumbnails, titles and "added by" attribution. Play now, skip, clear, and auto-advance when a video ends.
+- Loading a video never yanks the screen away from the room: if something is already playing, it joins the queue instead. Interrupting is still possible, but only through actions that are deliberate and announced in chat.
 - Loop toggle, shared by the whole room.
 - Favorites with play counts, stored in your browser rather than the room.
 - "I'm Feeling Lucky" pulls a random favorite the room hasn't watched yet, for when nobody can decide. It queues rather than interrupting, unless nothing is playing.

@@ -81,7 +81,7 @@
 
   <div id="videoRow">
     <input id="videoInput" placeholder="Paste YouTube link or video ID" onkeydown="if(event.key==='Enter') loadVideo()">
-    <button onclick="loadVideo()">Load Video</button>
+    <button onclick="loadVideo()" title="Plays straight away if the room is idle, otherwise adds to the queue">Load Video</button>
     <button class="btn-accent" onclick="addToQueue()">+ Queue</button>
     <button class="btn-lucky" onclick="feelingLucky()" title="Pick a random favorite nobody has played yet">I'm Feeling Lucky!</button>
   </div>
