@@ -48,7 +48,7 @@ What "the opposite" means in practice:
 | :---: | :---: | :---: |
 | ![The Classic 2008 theme](docs/screenshots/room-yt2008.png) | ![The Neon 90s theme](docs/screenshots/room-neon90s.png) | ![The Midnight theme](docs/screenshots/room-midnight.png) |
 
-Switch anytime with the selector in the lobby or the room. Themes are CSS custom properties on top of the same markup. Adding your own is a small diff (see [CONTRIBUTING.md](CONTRIBUTING.md)), and [the theme gallery issue](https://github.com/7akob/skood-2-g/issues/2) has a ready-designed light theme waiting for a first contributor.
+Switch anytime with the selector in the lobby or the room. All three are the same HTML: Classic 2008 rebuilds it into a period watch page, with a masthead search bar, a nav strip, related-video style sidebar modules and a footer, using CSS grid areas rather than different markup. Adding your own theme is a small diff (see [CONTRIBUTING.md](CONTRIBUTING.md)), and [the theme gallery issue](https://github.com/7akob/skood-2-g/issues/2) has a ready-designed light theme waiting for a first contributor.
 
 ## Quick start
 

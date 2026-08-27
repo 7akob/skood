@@ -82,7 +82,7 @@
   <div id="videoRow">
     <input id="videoInput" placeholder="Paste YouTube link or video ID" onkeydown="if(event.key==='Enter') loadVideo()">
     <button onclick="loadVideo()">Load Video</button>
-    <button onclick="addToQueue()">+ Queue</button>
+    <button class="btn-accent" onclick="addToQueue()">+ Queue</button>
   </div>
 
   <div id="nowPlaying">
@@ -115,10 +115,39 @@
 
   <div class="retro-divider"></div>
 
-  <h2>Chat</h2>
+  <h2 id="chatHead">Chat</h2>
   <div id="chatBox"></div>
-  <input id="chatInput" placeholder="Type a message" onkeydown="if(event.key==='Enter') sendMessage()">
-  <button onclick="sendMessage()">Send</button>
+  <div id="chatForm">
+    <input id="chatInput" placeholder="Type a message" onkeydown="if(event.key==='Enter') sendMessage()">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <!-- Period chrome below: the Classic 2008 theme lays these out, the other
+       themes hide them. Grid areas place them, so DOM order stays fixed. -->
+  <div id="shareBox">
+    <span class="share-label">Share:</span>
+    <input id="shareUrl" readonly onclick="this.select()">
+    <button class="btn-small" onclick="copyRoomLink()">Copy</button>
+  </div>
+
+  <div id="siteFooter">
+    <div class="footer-col">
+      <strong>Skood</strong>
+      <a href="https://github.com/7akob/skood-2-g">Source</a>
+      <a href="https://github.com/7akob/skood-2-g#readme">About</a>
+    </div>
+    <div class="footer-col">
+      <strong>Help</strong>
+      <a href="https://github.com/7akob/skood-2-g/issues/new?template=bug_report.yml">Report a bug</a>
+      <a href="https://github.com/7akob/skood-2-g/blob/main/CONTRIBUTING.md">Contribute</a>
+    </div>
+    <div class="footer-col">
+      <strong>Project</strong>
+      <a href="https://github.com/7akob/skood-2-g/issues">Ideas</a>
+      <a href="https://buymeacoffee.com/7akob">Support the server</a>
+    </div>
+    <div class="footer-note">Skood is free and open source. Not affiliated with YouTube.</div>
+  </div>
 
 </div>
 

@@ -167,8 +167,12 @@ function enterRoom(roomId) {
   history.replaceState({}, "", "?room=" + roomId);
   document.getElementById("roomCodeDisplay").textContent = roomId;
   document.getElementById("usernameDisplay").textContent = username;
-  document.getElementById("lobby").style.display = "none";
-  document.getElementById("app").style.display = "block";
+  // Class toggles rather than inline display, so each theme decides how #app
+  // lays out (the Classic 2008 theme makes it a grid; inline styles would win).
+  document.getElementById("lobby").classList.add("hidden");
+  document.getElementById("app").classList.add("active");
+  const shareUrl = document.getElementById("shareUrl");
+  if (shareUrl) shareUrl.value = location.origin + "?room=" + roomId;
   renderFavorites();
   if (socket.connected) {
     socket.emit("join_room", { roomId: currentRoomId, username });
@@ -182,9 +186,11 @@ function leaveRoom() {
   pendingSync = null;
   currentVideoId = null;
   currentVideoTitle = null;
-  document.getElementById("app").style.display = "none";
-  document.getElementById("lobby").style.display = "block";
+  document.getElementById("app").classList.remove("active");
+  document.getElementById("lobby").classList.remove("hidden");
   document.getElementById("roomJoinInput").value = "";
+  const shareUrl = document.getElementById("shareUrl");
+  if (shareUrl) shareUrl.value = "";
   renderPresence([]);
   updateLobbyStats();
 }
