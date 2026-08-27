@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 🧑‍💻 Want to help out?
+    url: https://github.com/7akob/skood-2-g/blob/main/CONTRIBUTING.md
+    about: The contributing guide — running locally, testing sync with two windows, and how themes work.
+  - name: ☕ Say thanks
+    url: https://buymeacoffee.com/7akob
+    about: Skood is free forever; a coffee is always appreciated.

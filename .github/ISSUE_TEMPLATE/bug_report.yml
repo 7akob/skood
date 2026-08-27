@@ -1,0 +1,47 @@
+name: 🐛 Bug report
+description: Something broke or behaved wrong
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect instead?
+      placeholder: "Pausing on my end didn't pause for the other person..."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Create a room
+        2. Friend joins via the link
+        3. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where did it happen?
+      options:
+        - skood.jkb.app (public instance)
+        - Self-hosted
+        - Local dev (npm start)
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and OS
+      placeholder: "Chrome 139 on Windows 11 / Safari on iOS 19"
+    validations:
+      required: true
+  - type: textarea
+    id: console
+    attributes:
+      label: Console errors (optional)
+      description: Open DevTools (F12) → Console, and paste anything red.
+      render: text
+    validations:
+      required: false

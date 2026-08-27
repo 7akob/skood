@@ -1,0 +1,30 @@
+name: 💡 Feature request
+description: An idea that would make watch nights better
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's the problem or itch?
+      description: Describe the situation where Skood falls short, rather than jumping straight to a solution.
+      placeholder: "When we watch with 6+ people, ..."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: What would you like to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered (optional)
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        Heads-up on scope: Skood deliberately stays vanilla — no frameworks, no build step,
+        no database, no accounts, no API keys. Ideas that fit inside that philosophy have
+        the best odds.
