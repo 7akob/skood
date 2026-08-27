@@ -131,6 +131,7 @@ Yes. Free to use at [skood.jkb.app](https://skood.jkb.app), free to self-host, M
 
 - Something broke? [File a bug](https://github.com/7akob/skood-2-g/issues/new?template=bug_report.yml). Takes two minutes.
 - Missing a feature? [Suggest it](https://github.com/7akob/skood-2-g/issues/new?template=feature_request.yml).
+- Do frontend or UX work? This is the part of Skood that needs help most. [Issue #4](https://github.com/7akob/skood-2-g/issues/4) lists the rough edges I already know about, from the blocking browser dialogs to the missing accessibility pass, each one small enough for a single pull request.
 - Want to add a theme? [The theme gallery](https://github.com/7akob/skood-2-g/issues/2) walks you through it, and a designed but unbuilt light theme is up for grabs.
 - Want to hack on it? Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [`help wanted`](https://github.com/7akob/skood-2-g/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [`good first issue`](https://github.com/7akob/skood-2-g/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) labels.
 
