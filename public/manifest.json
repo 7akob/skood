@@ -1,11 +1,11 @@
 {
-  "name": "Skood på YouTube",
+  "name": "Skood",
   "short_name": "Skood",
   "description": "Watch YouTube together",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000080",
-  "theme_color": "#000080",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
   "icons": [
     {
       "src": "/icon.svg",

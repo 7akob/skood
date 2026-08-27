@@ -11,8 +11,8 @@ const THEMES = ["yt2008", "neon90s"];
 function getTheme() {
   try {
     const t = localStorage.getItem("yt_theme");
-    return THEMES.includes(t) ? t : "neon90s";
-  } catch { return "neon90s"; }
+    return THEMES.includes(t) ? t : "yt2008";
+  } catch { return "yt2008"; }
 }
 function saveTheme(t) {
   try { localStorage.setItem("yt_theme", t); } catch {}

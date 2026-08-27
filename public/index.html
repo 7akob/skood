@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#000080">
+  <meta name="theme-color" content="#FFFFFF">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Skood Together</title>
@@ -15,7 +15,7 @@
     (function () {
       var t = null;
       try { t = localStorage.getItem("yt_theme"); } catch (e) {}
-      document.documentElement.dataset.theme = (t === "yt2008") ? "yt2008" : "neon90s";
+      document.documentElement.dataset.theme = (t === "neon90s") ? "neon90s" : "yt2008";
     })();
   </script>
   <link rel="stylesheet" href="style.css">
