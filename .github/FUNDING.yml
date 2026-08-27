@@ -1,0 +1,5 @@
+# Shows a "Sponsor" button on the GitHub repo page.
+# TODO: create an account at https://buymeacoffee.com, then uncomment the
+# line below and replace YOUR-HANDLE with your Buy Me a Coffee username:
+# buy_me_a_coffee: YOUR-HANDLE
+custom: ["https://github.com/7akob"]
