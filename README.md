@@ -48,7 +48,7 @@ The opposite, concretely:
 | :---: | :---: | :---: |
 | ![The Classic 2008 theme](docs/screenshots/room-yt2008.png) | ![The Neon 90s theme](docs/screenshots/room-neon90s.png) | ![The Midnight theme](docs/screenshots/room-midnight.png) |
 
-Switch anytime with the theme selector in the lobby or the room. Themes are CSS custom properties on top of the same markup — adding your own is [a small, well-marked diff](CONTRIBUTING.md), and contributions are welcome.
+Switch anytime with the theme selector in the lobby or the room. Themes are CSS custom properties on top of the same markup — adding your own is [a small, well-marked diff](CONTRIBUTING.md), and [the theme gallery issue](https://github.com/7akob/skood-2-g/issues/2) even has a ready-designed light theme waiting for a first contributor.
 
 ## Quick start
 
@@ -131,7 +131,8 @@ Yes — free to use at [skood.jkb.app](https://skood.jkb.app), free to self-host
 
 - 🐛 Something broke? [File a bug](https://github.com/7akob/skood-2-g/issues/new?template=bug_report.yml) — takes two minutes.
 - 💡 Missing a feature? [Suggest it](https://github.com/7akob/skood-2-g/issues/new?template=feature_request.yml).
-- 🎨 Want to add a theme, or hack on it? Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [`help wanted`](https://github.com/7akob/skood-2-g/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) / [`good first issue`](https://github.com/7akob/skood-2-g/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) labels.
+- 🎨 Want to add a theme? [The theme gallery](https://github.com/7akob/skood-2-g/issues/2) walks you through it (a designed-but-unbuilt light theme is up for grabs).
+- 🧑‍💻 Want to hack on it? Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [`help wanted`](https://github.com/7akob/skood-2-g/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) / [`good first issue`](https://github.com/7akob/skood-2-g/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) labels.
 
 The one rule: it stays vanilla — no frameworks, no build step, no database, no API keys.
 
