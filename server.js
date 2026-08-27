@@ -108,14 +108,19 @@ io.on("connection", (socket) => {
     socket.emit("sync_state", { ...getRoomState(room), queue: room.queue, users: presenceList(room) });
   });
 
+  // Relay only a validated {user, text} shape with capped lengths — the
+  // client escapes on render, but the server shouldn't forward junk either.
   socket.on("chat_message", (data) => {
-    if (!inRoom()) return;
-    io.to(roomId).emit("chat_message", data);
+    if (!inRoom() || !data || typeof data.user !== "string" || typeof data.text !== "string") return;
+    const user = data.user.trim().slice(0, 20);
+    const text = data.text.trim().slice(0, 500);
+    if (!user || !text) return;
+    io.to(roomId).emit("chat_message", { user, text });
   });
 
   socket.on("system_message", (msg) => {
-    if (!inRoom() || typeof msg !== "string") return;
-    io.to(roomId).emit("system_message", msg);
+    if (!inRoom() || typeof msg !== "string" || !msg.trim()) return;
+    io.to(roomId).emit("system_message", msg.slice(0, 300));
   });
 
   socket.on("change_video", (videoId) => {
