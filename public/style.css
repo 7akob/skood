@@ -135,6 +135,7 @@ button:hover {
   cursor: default;
   pointer-events: none;
 }
+.btn-leave { color: #FF6666; }
 
 /* ---- Presence ---- */
 #presenceBar {
@@ -212,6 +213,7 @@ button:hover {
   margin: 8px 0 4px;
   min-height: 24px;
 }
+#nowTitle { vertical-align: middle; }
 
 #starBtn { font-size: 22px; color: #FFFF00; }
 #starBtn:hover { color: #FF00FF; }
@@ -349,6 +351,10 @@ button:hover {
   font-family: "Comic Sans MS", Tahoma, sans-serif;
   text-align: left;
 }
+.msg-time { color: #FFFF00; }
+.msg-name { color: #00FFEA; }
+.msg-name.is-self { color: #00FF00; }
+.msg-text { color: #FFFFFF; }
 .sys-message {
   padding: 3px 4px;
   margin: 2px 0;

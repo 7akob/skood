@@ -39,7 +39,7 @@
   <div id="roomBar">
     Room: <span id="roomCodeDisplay"></span>
     <button class="btn-icon" id="copyLinkBtn" onclick="copyRoomLink()" title="Copy Link">🔗</button>
-    <button class="btn-icon" onclick="leaveRoom()" title="Leave Room" style="color:#FF6666;">✕</button>
+    <button class="btn-icon btn-leave" onclick="leaveRoom()" title="Leave Room">✕</button>
   </div>
 
   <div id="userBar">
@@ -57,7 +57,7 @@
   </div>
 
   <div id="nowPlaying">
-    <span id="nowTitle" style="vertical-align:middle;">No video loaded</span>
+    <span id="nowTitle">No video loaded</span>
     <button class="btn-icon" id="starBtn" onclick="toggleFavorite()" title="Favorite" disabled>☆</button>
     <button class="btn-icon" id="replayBtn" onclick="playAgain()" title="Play again (adds to queue)" disabled>↻</button>
   </div>

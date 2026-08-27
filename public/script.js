@@ -590,11 +590,8 @@ function renderChatMessage(data) {
   el.className = "message";
   const safeText = escHtml(text);
   const safeUser = escHtml(user);
-  if (user === username) {
-    el.innerHTML = `<span style="color:#FFFF00;">[${time}]</span> <span style="color:#00FF00;"><b>Du:</b></span> <span style="color:#FFFFFF;">${safeText}</span>`;
-  } else {
-    el.innerHTML = `<span style="color:#FFFF00;">[${time}]</span> <span style="color:#00FFEA;"><b>${safeUser}:</b></span> <span style="color:#FFFFFF;">${safeText}</span>`;
-  }
+  const self = user === username;
+  el.innerHTML = `<span class="msg-time">[${time}]</span> <span class="msg-name${self ? " is-self" : ""}"><b>${self ? "Du" : safeUser}:</b></span> <span class="msg-text">${safeText}</span>`;
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
 }
