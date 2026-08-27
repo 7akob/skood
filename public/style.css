@@ -1,12 +1,12 @@
 /* ==========================================================================
-   Skood — themeable stylesheet
+   Skood themeable stylesheet
    ---------------------------------------------------------------------------
    :root holds the token values for the default "yt2008" theme (2008-era
    video-site look). html[data-theme="neon90s"] overrides the tokens (and,
    further down, a few structural rules) to restore the neon-90s look.
    html[data-theme=…] (0,1,1) intentionally out-specifies :root (0,1,0).
    Theme blocks must only change look (color/background/border/shadow/font/
-   alignment) — never layout properties the mobile media query touches.
+   alignment), never layout properties the mobile media query touches.
    ========================================================================== */
 
 :root {
@@ -181,7 +181,7 @@ html[data-theme="midnight"] {
   --page-align: left;
   --text-main: #E2E8F0;
   --text-muted: #94A3B8;
-  --text-faint: #94A3B8; /* .item-by is 10px italic — needs full muted brightness */
+  --text-faint: #94A3B8; /* .item-by is 10px italic and needs full muted brightness */
   --text-empty: #7E8CA3;
   --emph: #F8FAFC;
 
@@ -210,7 +210,7 @@ html[data-theme="midnight"] {
   --loop-on-bg: #4F46E5; /* accent = shared-state ON */
   --loop-on-shadow: inset 0 1px 2px rgba(2, 6, 23, 0.5);
 
-  /* panels / boxes — glows become soft elevation */
+  /* panels / boxes: glows become soft elevation */
   --panel-bg: #141D2F;
   --panel-border: 1px solid #263349;
   --panel-border-heavy: 1px solid #263349;
@@ -280,7 +280,7 @@ h1 {
 }
 
 /* Wordmark: the app's own name as a styled logo. Deliberately NOT paired
-   with a play-triangle glyph — that combination is YouTube's trademark. */
+   with a play-triangle glyph, because that combination is YouTube's trademark. */
 .logo-badge {
   background: #CC0000;
   color: #FFFFFF;
@@ -682,7 +682,7 @@ button:hover {
 }
 
 /* ==========================================================================
-   Neon-90s structural overrides — mirrors of every base rule the yt2008
+   Neon-90s structural overrides: mirrors of every base rule the yt2008
    theme reshaped. Look-only properties here; never layout the mobile
    media query below also touches.
    ========================================================================== */
@@ -745,14 +745,14 @@ html[data-theme="neon90s"] .sys-message {
 }
 
 /* ==========================================================================
-   Midnight structural overrides — modern card treatment. Look-only;
+   Midnight structural overrides: modern card treatment. Look-only;
    color-bearing values route through tokens so a future light sibling
    ("daylight") could reuse these rules as a pure token delta.
    ========================================================================== */
 
 html[data-theme="midnight"] h1 { border-bottom: var(--panel-border); }
 
-/* Wordmark: indigo rounded chip — still Skood's own mark, not the red badge */
+/* Wordmark: indigo rounded chip, still Skood's own mark rather than the red badge */
 html[data-theme="midnight"] .logo-badge {
   background: linear-gradient(135deg, #6366F1, #8B5CF6);
   color: #FFFFFF;
@@ -775,7 +775,7 @@ html[data-theme="midnight"] #chatBox { border-radius: 12px; }
    2008 hairline color needs replacing */
 html[data-theme="midnight"] .panel-header { border-bottom: var(--panel-border); }
 
-/* The panel is already titled "Favorites" — no star garnish */
+/* The panel is already titled "Favorites", so no star garnish */
 html[data-theme="midnight"] #favoritesPanel .panel-header h2::before { content: none; }
 
 /* Rounded thumbnails and player frame */

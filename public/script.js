@@ -6,8 +6,8 @@ if ("serviceWorker" in navigator) {
 // -------------------- THEME --------------------
 // The head snippet in index.html already set data-theme before first paint;
 // this re-apply exists to sync the selects and the meta theme-color.
-// The theme list lives in three places — THEMES, THEME_COLORS, and the head
-// snippet's VALID array — change all of them together.
+// The theme list lives in three places (THEMES, THEME_COLORS, and the head
+// snippet's VALID array); change all of them together.
 const THEMES = ["yt2008", "neon90s", "midnight"];
 // Per-theme meta theme-color; must match each theme's --bg-page.
 const THEME_COLORS = {
@@ -72,7 +72,7 @@ function editUsername() {
 
 // -------------------- SOCKET --------------------
 // Must be created before ROOM LOBBY below: the auto-join-from-URL check
-// calls enterRoom(), which reads `socket` — if `socket` were declared
+// calls enterRoom(), which reads `socket`. If `socket` were declared
 // after that point, joining via a shared room link (?room=CODE) would
 // throw "Cannot access 'socket' before initialization" and abort the
 // rest of this script, leaving the page with no connection at all.
@@ -88,7 +88,7 @@ socket.on("disconnect", () => setConnected(false));
 
 socket.on("connect", () => {
   setConnected(true);
-  // Re-join room on every connect/reconnect — server sends fresh sync_state in response
+  // Re-join room on every connect/reconnect; server sends fresh sync_state in response
   if (currentRoomId) socket.emit("join_room", { roomId: currentRoomId, username });
 });
 
@@ -230,7 +230,7 @@ function showCopiedTip() {
   setTimeout(() => tip.remove(), 1400);
 }
 
-// Check URL on load — skip lobby if room param present
+// Check URL on load, skip lobby if room param present
 (function () {
   const params = new URLSearchParams(location.search);
   const room = params.get("room");
@@ -274,7 +274,7 @@ function applySync(s) {
   // seekTo() right after loadVideoById(). seekTo() issued immediately after
   // loadVideoById() races the player's async video load and is frequently
   // dropped, silently landing a joining viewer at 0:00 instead of the
-  // host's actual position — this was the "not synced on join" bug.
+  // host's actual position. This was the "not synced on join" bug.
   if (s.isPlaying) {
     player.loadVideoById(s.videoId, s.time);
     lastState = YT.PlayerState.PLAYING;
@@ -335,7 +335,7 @@ function clearQueue() {
   socket.emit("clear_queue", username);
 }
 
-// Loop is shared room state (like play/pause) — toggling it round-trips
+// Loop is shared room state (like play/pause); toggling it round-trips
 // through the server so everyone's button reflects the same on/off state.
 function toggleLoop() { socket.emit("toggle_loop"); }
 
@@ -356,7 +356,7 @@ function extractId(str) {
   if (m1) return m1[1];
   const m2 = str.match(/youtu\.be\/([^?&]+)/);
   if (m2) return m2[1];
-  // Shorts / live / embed links don't carry a v= param — without this,
+  // Shorts / live / embed links don't carry a v= param. Without this,
   // the whole URL was passed to loadVideoById() as an "ID", which
   // YouTube's player rejects with its own generic error screen.
   const m3 = str.match(/\/(?:shorts|live|embed)\/([^?&]+)/);
@@ -392,7 +392,7 @@ function onStateChange(event) {
 function resetSuppress() { setTimeout(() => suppressEvents = false, 300); }
 
 // Surfaces YouTube's player errors in chat instead of leaving a silent
-// dead embed — e.g. removed/private videos or embedding disabled by the
+// dead embed, e.g. removed/private videos or embedding disabled by the
 // uploader (error codes per the IFrame API docs).
 function onPlayerError(event) {
   const messages = {
@@ -467,7 +467,7 @@ function toggleFavorite() {
     favs.splice(idx, 1);
   } else {
     // Seed with 1 play since you're favoriting it while it's already
-    // playing — bumpFavoritePlayCount() only fires on future plays.
+    // playing; bumpFavoritePlayCount() only fires on future plays.
     favs.unshift({ id: currentVideoId, title: currentVideoTitle || currentVideoId, plays: 1 });
   }
   saveFavorites(favs);
@@ -475,7 +475,7 @@ function toggleFavorite() {
   updateStarBtn();
 }
 
-// Also toggles the replay button's disabled state — both need a
+// Also toggles the replay button's disabled state; both need a
 // currentVideoId to do anything, so they share this update point.
 function updateStarBtn() {
   const hasVideo = !!currentVideoId;

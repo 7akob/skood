@@ -7,7 +7,7 @@ const app = express();
 app.use(express.static("public"));
 
 // Aggregate-only lobby stat: how many rooms are open right now.
-// Deliberately nothing else — no names, no per-room data, no history.
+// Deliberately nothing else, no names or per-room data.
 app.get("/stats", (req, res) => {
   res.json({ rooms: Object.keys(rooms).length });
 });
@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
   let username = null;
 
   socket.on("join_room", (payload) => {
-    // Accept either the old bare-string shape or {roomId, username} —
+    // Accept either the old bare-string shape or {roomId, username};
     // username is needed for the presence list and join/leave messages.
     const id = typeof payload === "string" ? payload : payload && payload.roomId;
     const name = (typeof payload === "object" && payload && payload.username) || "";
@@ -81,7 +81,7 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("system_message", `${old} is now known as ${username}`);
   });
 
-  // Shared by an explicit "leave" and a dropped connection — removes this
+  // Shared by an explicit "leave" and a dropped connection: removes this
   // socket from the room's presence, deletes the room if that was the
   // last person, otherwise tells whoever's left.
   function leaveCurrentRoom() {
@@ -114,7 +114,7 @@ io.on("connection", (socket) => {
     socket.emit("sync_state", { ...getRoomState(room), queue: room.queue, users: presenceList(room) });
   });
 
-  // Relay only a validated {user, text} shape with capped lengths — the
+  // Relay only a validated {user, text} shape with capped lengths. The
   // client escapes on render, but the server shouldn't forward junk either.
   socket.on("chat_message", (data) => {
     if (!inRoom() || !data || typeof data.user !== "string" || typeof data.text !== "string") return;
@@ -135,7 +135,7 @@ io.on("connection", (socket) => {
     room.state.videoId = videoId;
     room.state.time = 0;
     // loadVideoById() autoplays on every client (loader and receivers
-    // alike), so the room really is playing at this point — marking it
+    // alike), so the room really is playing at this point. Marking it
     // paused here made anyone who joined right after a video change get
     // cued as paused while everyone already present was actually playing.
     room.state.isPlaying = true;
@@ -214,7 +214,7 @@ io.on("connection", (socket) => {
       // Everyone in the room independently detects ENDED and emits this,
       // so a duplicate for the same play-through arrives moments later.
       // Unlike the non-loop path, videoId doesn't change on replay, so it
-      // can't be used to dedupe — guard on how recently we last restarted
+      // can't be used to dedupe, so guard on how recently we last restarted
       // instead (a real video can't end again within 1.5s of restarting).
       // Tracked separately from state.lastUpdate, which other actions
       // (change_video, play, pause, seek) also touch and would otherwise

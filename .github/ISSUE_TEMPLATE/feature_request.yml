@@ -1,4 +1,4 @@
-name: 💡 Feature request
+name: Feature request
 description: An idea that would make watch nights better
 labels: ["enhancement"]
 body:
@@ -25,6 +25,6 @@ body:
   - type: markdown
     attributes:
       value: |
-        Heads-up on scope: Skood deliberately stays vanilla — no frameworks, no build step,
-        no database, no accounts, no API keys. Ideas that fit inside that philosophy have
+        Heads-up on scope: Skood deliberately stays vanilla (no frameworks, no build step,
+        no database, no accounts, no API keys). Ideas that fit inside that philosophy have
         the best odds.

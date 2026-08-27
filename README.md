@@ -2,7 +2,7 @@
 
 # Skood
 
-**Watch YouTube together in perfectly synced rooms — wearing its best 2008 outfit.**
+**Watch YouTube together in perfectly synced rooms, wearing its best 2008 outfit.**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Node >= 18](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](package.json)
@@ -11,36 +11,36 @@
 
 <img src="docs/screenshots/room-yt2008.png" alt="A Skood room in the Classic 2008 theme: synced player, shared queue, favorites and chat" width="760">
 
-### ▶ Try it now at [skood.jkb.app](https://skood.jkb.app)
+### Try it now at [skood.jkb.app](https://skood.jkb.app)
 
-*No account, no install — create a room and share the link.*
+*No account, no install. Create a room and share the link.*
 *(Community instance on a small box; if it's ever busy, self-hosting is two commands.)*
 
 </div>
 
 ## Why Skood
 
-Skood exists because watching a video together shouldn't require an account, a subscription nag, or a page fighting your ad blocker. Every watch-together site we tried was some mix of paywalled features, layered ads and trackers, and mysterious "this content is unavailable" walls — so we built the opposite and have used it for movie nights over Discord for about a year, first as a single shared session, now with rooms so any group can use it at once. It also does great projected on a wall at parties.
+Skood exists because watching a video together shouldn't require an account, a subscription nag, or a page fighting your ad blocker. Every watch-together site I tried had some of that: paywalled features, heavy ads, trackers, or videos that refused to play. So I built the opposite, and it's been in weekly use for movie nights over Discord for about a year. It started as one shared session for my friend group; rooms came later so that any number of groups can use it at the same time. It also does great projected on a wall at parties.
 
-The opposite, concretely:
+What "the opposite" means in practice:
 
-- **No ads and no trackers of its own** — nothing breaks if you run an ad blocker, because there's nothing to block. Whatever YouTube does inside its own player is untouched.
-- **No accounts** — pick a name, you're in.
-- **No database** — rooms live in the server's memory and evaporate when the last person leaves. There is nothing to breach, sell, or subpoena.
-- **No lock-in** — MIT-licensed, ~250-line server, self-hostable in two commands. It stays free.
+- No ads and no trackers of its own. Nothing breaks if you run an ad blocker, because there is nothing to block. Whatever YouTube does inside its own player is untouched.
+- No accounts. Pick a name and you're in.
+- No database. Rooms live in the server's memory and evaporate when the last person leaves. There is nothing to breach, sell, or subpoena.
+- No lock-in. MIT licensed, a server that fits in 260 lines, self-hostable in two commands. It stays free.
 
-*Skood is from Swedish **skåda** — to watch.*
+*Skood comes from the Swedish "skåda", to watch.*
 
 ## Features
 
-- **Synced playback** — play, pause, and seek follow everyone in the room. The server keeps the authoritative position, so late joiners land exactly where the room is, not at 0:00.
-- **Shareable rooms** — six-character room codes and `?room=CODE` deep links with one-click copy.
-- **Shared queue** — thumbnails, titles, and *added by* attribution; play-now, skip, clear, and auto-advance when a video ends.
-- **Loop toggle** — shared room state, replays the current video for everyone.
-- **Favorites with play counts** — star videos for yourself (stored in your browser, not the room) and see how many times you've watched them.
-- **Presence & chat** — live list of who's in the room, join/leave/rename notices, and an ephemeral room chat.
-- **PWA + media keys** — installable, and your lock-screen/keyboard media controls drive the shared room state.
-- **Three themes** — see below. Your pick is remembered per browser.
+- Synced playback: play, pause and seek follow everyone in the room. The server keeps the authoritative position, so late joiners land exactly where the room is instead of at 0:00.
+- Shareable rooms: six-character codes and `?room=CODE` deep links with one-click copy.
+- Shared queue with thumbnails, titles and "added by" attribution. Play now, skip, clear, and auto-advance when a video ends.
+- Loop toggle, shared by the whole room.
+- Favorites with play counts, stored in your browser rather than the room.
+- Presence and chat: a live list of who's in the room, join/leave/rename notices, and an ephemeral room chat.
+- Installable as a PWA, and your lock screen media controls drive the shared room state.
+- Three themes, remembered per browser.
 
 ## Themes
 
@@ -48,7 +48,7 @@ The opposite, concretely:
 | :---: | :---: | :---: |
 | ![The Classic 2008 theme](docs/screenshots/room-yt2008.png) | ![The Neon 90s theme](docs/screenshots/room-neon90s.png) | ![The Midnight theme](docs/screenshots/room-midnight.png) |
 
-Switch anytime with the theme selector in the lobby or the room. Themes are CSS custom properties on top of the same markup — adding your own is [a small, well-marked diff](CONTRIBUTING.md), and [the theme gallery issue](https://github.com/7akob/skood-2-g/issues/2) even has a ready-designed light theme waiting for a first contributor.
+Switch anytime with the selector in the lobby or the room. Themes are CSS custom properties on top of the same markup. Adding your own is a small diff (see [CONTRIBUTING.md](CONTRIBUTING.md)), and [the theme gallery issue](https://github.com/7akob/skood-2-g/issues/2) has a ready-designed light theme waiting for a first contributor.
 
 ## Quick start
 
@@ -59,7 +59,7 @@ npm install
 npm start
 ```
 
-Open <http://localhost:3000>, create a room, and share the link. That's the whole setup — the YouTube IFrame player, title lookup, and thumbnails are all keyless public endpoints.
+Open <http://localhost:3000>, create a room, and share the link. That's the whole setup: the YouTube IFrame player, title lookup and thumbnails are all keyless public endpoints.
 
 ### Docker
 
@@ -73,8 +73,8 @@ The bundled `docker-compose.yml` binds to `127.0.0.1:3000` on purpose: it expect
 
 Two things matter when you put Skood behind a reverse proxy:
 
-1. **WebSockets must be forwarded.** Skood uses the WebSocket transport only (no HTTP long-polling fallback), so a proxy that doesn't forward upgrade headers breaks it completely.
-2. Rooms live in memory — a restart clears them, and there's nothing to back up. Run a single instance.
+1. WebSockets must be forwarded. Skood uses the WebSocket transport only, with no HTTP long-polling fallback, so a proxy that doesn't forward upgrade headers breaks it completely.
+2. Rooms live in memory. A restart clears them and there is nothing to back up. Run a single instance.
 
 **Caddy** (handles WebSockets automatically):
 
@@ -98,43 +98,43 @@ location / {
 
 ## How it works
 
-The whole app is five files. An Express + Socket.IO server (`server.js`, ~260 lines) keeps a per-room state object — `{ videoId, time, isPlaying, loop }` plus the queue and presence — entirely in memory. Every play/pause/seek updates it and is broadcast to the room; when someone joins or reconnects, the server extrapolates the current position from the last update timestamp so they sync to where the room *actually is*. When the last person leaves, the room evaporates.
+The whole app is five files. An Express + Socket.IO server (`server.js`, around 260 lines) keeps a per-room state object entirely in memory: `{ videoId, time, isPlaying, loop }` plus the queue and presence. Every play, pause and seek updates it and is broadcast to the room. When someone joins or reconnects, the server extrapolates the current position from the last update timestamp, so they sync to where the room actually is. When the last person leaves, the room evaporates.
 
-The client (`public/`) is vanilla HTML/CSS/JS driving the official YouTube IFrame player. No framework, no bundler, no transpiler — what's in the repo is what ships. Favorites and your username stay in `localStorage`; nothing about you is stored server-side.
+The client (`public/`) is vanilla HTML, CSS and JavaScript driving the official YouTube IFrame player. No framework, no bundler, no transpiler. What's in the repo is what ships. Favorites and your username stay in `localStorage`; nothing about you is stored server-side.
 
 Design goals, in order: cheap to run on a free tier, trivial to self-host, easy to read in one sitting.
 
 ## Privacy
 
-The claim "no tracking" is verifiable — the code is one sitting long. The full inventory:
+The "no tracking" claim is verifiable, since the code is one sitting long. The full inventory:
 
-- **What the server holds:** the live room object only — room code, current video ID and position, the queue, and the names people typed. In memory, never written to disk, deleted the moment the last person leaves.
-- **What your browser stores:** your username, favorites, and theme choice, in `localStorage`. Clear site data and they're gone.
-- **What's counted:** the lobby shows how many rooms are open right now. That's the server reporting the size of its own in-memory list — an aggregate number with no names, no history, and no storage behind it.
-- **What doesn't exist:** cookies, analytics, fingerprinting, logs of what anyone watched.
+- What the server holds: the live room object only. Room code, current video ID and position, the queue, and the names people typed. In memory, never written to disk, deleted the moment the last person leaves.
+- What your browser stores: your username, favorites and theme choice, in `localStorage`. Clear site data and they're gone.
+- What's counted: the lobby shows how many rooms are open right now. That is the server reporting the size of its own in-memory list. No names, no history, no storage behind it.
+- What doesn't exist: cookies, analytics, fingerprinting, and logs of what anyone watched.
 
 ## FAQ
 
 **Will YouTube block this?**
-Unlikely — Skood is a plain, by-the-book embed. It uses the official YouTube IFrame Player API, and every viewer streams directly from YouTube in their own player: views count, region rules apply, and YouTube's own embed behavior is untouched. Nothing is proxied, downloaded, or stripped, so there's nothing to crack down on.
+Unlikely. Skood is a plain, by-the-book embed. It uses the official YouTube IFrame Player API, and every viewer streams directly from YouTube in their own player: views count, region rules apply, and YouTube's own embed behavior is untouched. Nothing is proxied, downloaded or stripped, so there is nothing to crack down on.
 
 **Why do some videos refuse to play ("not allowed on other sites")?**
-The uploader or their label disabled embedding for that video. It affects every embed on the web equally — Skood just tells you in chat instead of showing a silently dead player.
+The uploader or their label disabled embedding for that video. It affects every embed on the web equally. Skood just tells you in chat instead of showing a silently dead player.
 
-**Everyone drifted apart for a moment — why?**
-If YouTube serves one viewer an ad inside the embed, that person's clock differs until it ends. A pause/play from anyone, or refocusing the tab, resyncs the room.
+**Everyone drifted apart for a moment. Why?**
+If YouTube serves one viewer an ad inside the embed, that person's clock differs until it ends. A pause and play from anyone, or refocusing the tab, resyncs the room.
 
 **Is it really free?**
-Yes — free to use at [skood.jkb.app](https://skood.jkb.app), free to self-host, MIT-licensed. If you want to say thanks, see [Support](#support).
+Yes. Free to use at [skood.jkb.app](https://skood.jkb.app), free to self-host, MIT licensed. The project takes no profit; see [Support](#support) for how the running costs are handled.
 
-## Feedback & contributing
+## Feedback and contributing
 
-- 🐛 Something broke? [File a bug](https://github.com/7akob/skood-2-g/issues/new?template=bug_report.yml) — takes two minutes.
-- 💡 Missing a feature? [Suggest it](https://github.com/7akob/skood-2-g/issues/new?template=feature_request.yml).
-- 🎨 Want to add a theme? [The theme gallery](https://github.com/7akob/skood-2-g/issues/2) walks you through it (a designed-but-unbuilt light theme is up for grabs).
-- 🧑‍💻 Want to hack on it? Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [`help wanted`](https://github.com/7akob/skood-2-g/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) / [`good first issue`](https://github.com/7akob/skood-2-g/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) labels.
+- Something broke? [File a bug](https://github.com/7akob/skood-2-g/issues/new?template=bug_report.yml). Takes two minutes.
+- Missing a feature? [Suggest it](https://github.com/7akob/skood-2-g/issues/new?template=feature_request.yml).
+- Want to add a theme? [The theme gallery](https://github.com/7akob/skood-2-g/issues/2) walks you through it, and a designed but unbuilt light theme is up for grabs.
+- Want to hack on it? Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [`help wanted`](https://github.com/7akob/skood-2-g/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [`good first issue`](https://github.com/7akob/skood-2-g/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) labels.
 
-The one rule: it stays vanilla — no frameworks, no build step, no database, no API keys.
+The one rule: it stays vanilla. No frameworks, no build step, no database, no API keys.
 
 ## License
 
@@ -142,8 +142,11 @@ The one rule: it stays vanilla — no frameworks, no build step, no database, no
 
 ## Support
 
-Skood is free and always will be. If it made your movie night better:
+I have a day job and Skood doesn't need donations. The app is MIT licensed, carries no ads, and is never going to make money on purpose. What does exist is a small infrastructure bill for the public instance:
 
-- ⭐ star the repo — it genuinely helps people find it
-- ☕ [buy me a coffee](https://buymeacoffee.com/7akob)
-- 👋 check out my other projects at [github.com/7akob](https://github.com/7akob)
+| What | Cost |
+| --- | --- |
+| VPS (shared with my other projects) | about 5 € per month |
+| Domain | about 5 € per year |
+
+If you'd like to help carry that, there is a [Buy Me a Coffee page](https://buymeacoffee.com/7akob). Everything contributed goes to the server and the domain, contributions are public on that page, and if they ever exceed the bills, the numbers and where the surplus went will be documented right here in this section. Starring the repo or showing a friend helps at least as much.

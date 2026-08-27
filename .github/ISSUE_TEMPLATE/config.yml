@@ -1,8 +1,8 @@
 blank_issues_enabled: true
 contact_links:
-  - name: 🧑‍💻 Want to help out?
+  - name: Want to help out?
     url: https://github.com/7akob/skood-2-g/blob/main/CONTRIBUTING.md
-    about: The contributing guide — running locally, testing sync with two windows, and how themes work.
-  - name: ☕ Say thanks
+    about: The contributing guide, with local setup, the two-window sync test, and how themes work.
+  - name: Chip in for server costs
     url: https://buymeacoffee.com/7akob
-    about: Skood is free forever; a coffee is always appreciated.
+    about: Skood takes no profit. Contributions cover the VPS and domain for the public instance.

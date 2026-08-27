@@ -1,7 +1,7 @@
 {
   "name": "skood-2-g",
   "version": "1.0.0",
-  "description": "Skood — watch YouTube together in synced rooms. Zero build step, no database, no API keys.",
+  "description": "Skood: watch YouTube together in synced rooms. No build step, no database, no API keys.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

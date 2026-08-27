@@ -1,4 +1,4 @@
-// Service worker — caches the app shell for fast/offline load
+// Service worker: caches the app shell for fast/offline load
 const CACHE = "skood-v3";
 const SHELL = [
   "/",
@@ -30,10 +30,10 @@ self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
   const url = new URL(e.request.url);
   if (url.origin !== self.location.origin) return;
-  // Never cache the live rooms count — a stale number is worse than none
+  // Never cache the live rooms count; a stale number is worse than none
   if (url.pathname === "/stats") return;
 
-  // Network first — fall back to cache if offline
+  // Network first, fall back to cache if offline
   e.respondWith(
     fetch(e.request)
       .then((res) => {

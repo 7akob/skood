@@ -6,13 +6,13 @@
   <meta name="theme-color" content="#FFFFFF">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Skood — watch YouTube together</title>
+  <title>Skood: watch YouTube together</title>
   <link rel="manifest" href="/manifest.json">
   <script>
     // Apply the saved theme before the stylesheet loads so the first paint
     // is already in the right theme (no flash of the wrong one). The theme
-    // list lives in three places — here, THEMES, and THEME_COLORS in
-    // script.js — change all of them together.
+    // list lives in three places (here, THEMES, and THEME_COLORS in
+    // script.js); change all of them together.
     (function () {
       var t = null;
       try { t = localStorage.getItem("yt_theme"); } catch (e) {}
@@ -21,7 +21,7 @@
     })();
   </script>
   <link rel="stylesheet" href="style.css">
-  <!-- Served by our own Socket.IO server — always version-matched, no CDN -->
+  <!-- Served by our own Socket.IO server, always version-matched, no CDN -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
 </head>
