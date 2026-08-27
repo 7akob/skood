@@ -1,6 +1,14 @@
 // Service worker — caches the app shell for fast/offline load
-const CACHE = "skoda-v1";
-const SHELL = ["/", "/index.html", "/icon.svg", "/manifest.json"];
+const CACHE = "skood-v2";
+const SHELL = [
+  "/",
+  "/index.html",
+  "/style.css",
+  "/script.js",
+  "/socket.io/socket.io.js",
+  "/icon.svg",
+  "/manifest.json"
+];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)));
