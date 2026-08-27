@@ -830,7 +830,10 @@ html[data-theme="yt2008"] #panels { grid-area: side; align-self: start; }
 html[data-theme="yt2008"] #app .retro-divider { display: none; }
 
 /* ---- Lobby: same masthead and nav strip, then a two-module split ---- */
-html[data-theme="yt2008"] #lobby {
+/* Scoped to :not(.hidden) on purpose. A bare `#lobby` here would outrank
+   `#lobby.hidden` further up the file and keep the lobby on screen behind
+   the room. The room grid is scoped to .active for the same reason. */
+html[data-theme="yt2008"] #lobby:not(.hidden) {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
@@ -1222,7 +1225,7 @@ html[data-theme="midnight"] .sys-message {
       "chat"
       "chatfm";
   }
-  html[data-theme="yt2008"] #lobby {
+  html[data-theme="yt2008"] #lobby:not(.hidden) {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas: "logo" "bar" "nav" "box";
   }
