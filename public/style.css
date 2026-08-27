@@ -748,9 +748,15 @@ html[data-theme="yt2008"] #app > h1 {
   padding-left: 0;
   font-size: 21px;
 }
+/* Four controls have to share the masthead cell, so they run compact here */
 html[data-theme="yt2008"] #videoRow { gap: 5px; justify-content: center; }
-html[data-theme="yt2008"] #videoInput { max-width: 420px; margin: 0; }
-html[data-theme="yt2008"] #videoRow button { margin: 0; }
+html[data-theme="yt2008"] #videoInput { max-width: 290px; margin: 0; }
+html[data-theme="yt2008"] #videoRow button {
+  margin: 0;
+  padding: 4px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+}
 html[data-theme="yt2008"] .btn-accent {
   background: linear-gradient(#FFE98C, #FFC50D);
   border-color: #C8A21B;

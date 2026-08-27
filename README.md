@@ -38,6 +38,7 @@ What "the opposite" means in practice:
 - Shared queue with thumbnails, titles and "added by" attribution. Play now, skip, clear, and auto-advance when a video ends.
 - Loop toggle, shared by the whole room.
 - Favorites with play counts, stored in your browser rather than the room.
+- "I'm Feeling Lucky" pulls a random favorite the room hasn't watched yet, for when nobody can decide. It queues rather than interrupting, unless nothing is playing.
 - Presence and chat: a live list of who's in the room, join/leave/rename notices, and an ephemeral room chat.
 - Installable as a PWA, and your lock screen media controls drive the shared room state.
 - Three themes, remembered per browser.

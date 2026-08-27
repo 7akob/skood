@@ -186,6 +186,7 @@ function leaveRoom() {
   pendingSync = null;
   currentVideoId = null;
   currentVideoTitle = null;
+  sessionPlayed.clear();
   document.getElementById("app").classList.remove("active");
   document.getElementById("lobby").classList.remove("hidden");
   document.getElementById("roomJoinInput").value = "";
@@ -415,6 +416,7 @@ function onPlayerError(event) {
 async function setNowPlaying(id, { announce = false } = {}) {
   currentVideoId = id;
   currentVideoTitle = null;
+  sessionPlayed.add(id);
   document.getElementById("nowTitle").textContent = "Loading...";
   updateStarBtn();
   bumpFavoritePlayCount(id);
@@ -460,6 +462,31 @@ async function fetchTitle(id) {
     const data = await res.json();
     return data.title || id;
   } catch { return id; }
+}
+
+// Everything this browser has seen play since joining, so "I'm Feeling Lucky"
+// can avoid repeating a video the room already watched tonight.
+const sessionPlayed = new Set();
+
+// Picks a random favorite of yours, preferring ones the room hasn't played
+// yet. Your favorites never leave the browser: only the chosen video is
+// shared, exactly as if you had pressed play on it yourself. A random pick
+// should never yank away what people are watching, so it queues instead
+// whenever something is already loaded.
+function feelingLucky() {
+  const favs = getFavorites();
+  if (!favs.length) {
+    appendSystemMessage("Star a few videos first and this button will pick one for you.");
+    return;
+  }
+  const unplayed = favs.filter((f) => !sessionPlayed.has(f.id));
+  const pool = unplayed.length ? unplayed : favs;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  if (currentVideoId) {
+    socket.emit("add_to_queue", { id: pick.id, title: pick.title, addedBy: username });
+  } else {
+    loadFavorite(pick.id);
+  }
 }
 
 function getFavorites() { return JSON.parse(localStorage.getItem("yt_favorites") || "[]"); }
