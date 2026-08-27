@@ -6,7 +6,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Node >= 18](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](package.json)
-[![CI](https://github.com/7akob/skood-2-g/actions/workflows/ci.yml/badge.svg)](https://github.com/7akob/skood-2-g/actions/workflows/ci.yml)
+[![CI](https://github.com/7akob/skood/actions/workflows/ci.yml/badge.svg)](https://github.com/7akob/skood/actions/workflows/ci.yml)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 <img src="docs/screenshots/room-yt2008.png" alt="A Skood room in the Classic 2008 theme: synced player, shared queue, favorites and chat" width="760">
@@ -25,7 +25,7 @@ Skood exists because watching a video together shouldn't require an account, a s
 What "the opposite" means in practice:
 
 - No ads and no trackers of its own. Nothing breaks if you run an ad blocker, because there is nothing to block. Whatever YouTube does inside its own player is untouched.
-- No accounts. Pick a name and you're in.
+- No accounts, and nothing to fill in before you can use it. You arrive with a name already picked for you and can change it whenever you like.
 - No database. Rooms live in the server's memory and evaporate when the last person leaves. There is nothing to breach, sell, or subpoena.
 - No lock-in. MIT licensed, a server that fits in 260 lines, self-hostable in two commands. It stays free.
 
@@ -50,13 +50,13 @@ What "the opposite" means in practice:
 | :---: | :---: | :---: |
 | ![The Classic 2008 theme](docs/screenshots/room-yt2008.png) | ![The Neon 90s theme](docs/screenshots/room-neon90s.png) | ![The Midnight theme](docs/screenshots/room-midnight.png) |
 
-Switch anytime with the selector in the lobby or the room. All three are the same HTML: Classic 2008 rebuilds it into a period watch page, with a masthead search bar, a nav strip, related-video style sidebar modules and a footer, using CSS grid areas rather than different markup. Adding your own theme is a small diff (see [CONTRIBUTING.md](CONTRIBUTING.md)), and [the theme gallery issue](https://github.com/7akob/skood-2-g/issues/2) has a ready-designed light theme waiting for a first contributor.
+Switch anytime with the selector in the lobby or the room. All three are the same HTML: Classic 2008 rebuilds it into a period watch page, with a masthead search bar, a nav strip, related-video style sidebar modules and a footer, using CSS grid areas rather than different markup. Adding your own theme is a small diff (see [CONTRIBUTING.md](CONTRIBUTING.md)), and [the theme gallery issue](https://github.com/7akob/skood/issues/2) has a ready-designed light theme waiting for a first contributor.
 
 ## Quick start
 
 ```bash
-git clone https://github.com/7akob/skood-2-g.git
-cd skood-2-g
+git clone https://github.com/7akob/skood.git
+cd skood
 npm install
 npm start
 ```
@@ -131,11 +131,11 @@ Yes. Free to use at [skood.jkb.app](https://skood.jkb.app), free to self-host, M
 
 ## Feedback and contributing
 
-- Something broke? [File a bug](https://github.com/7akob/skood-2-g/issues/new?template=bug_report.yml). Takes two minutes.
-- Missing a feature? [Suggest it](https://github.com/7akob/skood-2-g/issues/new?template=feature_request.yml).
-- Do frontend or UX work? This is the part of Skood that needs help most. [Issue #4](https://github.com/7akob/skood-2-g/issues/4) lists the rough edges I already know about, from the blocking browser dialogs to the missing accessibility pass, each one small enough for a single pull request.
-- Want to add a theme? [The theme gallery](https://github.com/7akob/skood-2-g/issues/2) walks you through it, and a designed but unbuilt light theme is up for grabs.
-- Want to hack on it? Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [`help wanted`](https://github.com/7akob/skood-2-g/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [`good first issue`](https://github.com/7akob/skood-2-g/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) labels.
+- Something broke? [File a bug](https://github.com/7akob/skood/issues/new?template=bug_report.yml). Takes two minutes.
+- Missing a feature? [Suggest it](https://github.com/7akob/skood/issues/new?template=feature_request.yml).
+- Do frontend or UX work? This is the part of Skood that needs help most. [Issue #4](https://github.com/7akob/skood/issues/4) lists the rough edges I already know about, from the blocking browser dialogs to the missing accessibility pass, each one small enough for a single pull request.
+- Want to add a theme? [The theme gallery](https://github.com/7akob/skood/issues/2) walks you through it, and a designed but unbuilt light theme is up for grabs.
+- Want to hack on it? Start with [CONTRIBUTING.md](CONTRIBUTING.md) and the [`help wanted`](https://github.com/7akob/skood/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [`good first issue`](https://github.com/7akob/skood/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) labels.
 
 The one rule: it stays vanilla. No frameworks, no build step, no database, no API keys.
 

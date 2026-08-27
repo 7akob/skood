@@ -1,7 +1,7 @@
 blank_issues_enabled: true
 contact_links:
   - name: Want to help out?
-    url: https://github.com/7akob/skood-2-g/blob/main/CONTRIBUTING.md
+    url: https://github.com/7akob/skood/blob/main/CONTRIBUTING.md
     about: The contributing guide, with local setup, the two-window sync test, and how themes work.
   - name: Chip in for server costs
     url: https://buymeacoffee.com/7akob

@@ -49,25 +49,75 @@ let loopEnabled = false;
 let currentQueueLength = 0;
 
 // -------------------- USERNAME --------------------
-let username = localStorage.getItem("yt_username");
-if (!username) {
-  let entered = "";
-  while (!entered) {
-    entered = (prompt("Welcome! What's your name?") || "").trim().slice(0, 20);
-  }
-  username = entered;
-  localStorage.setItem("yt_username", username);
+// Nobody should be met by a modal asking who they are before they have even
+// seen the page, so a name is picked for you and shown in the lobby where you
+// can change it like any other field.
+const NAME_ADJECTIVES = ["Happy", "Sleepy", "Turbo", "Retro", "Cosmic", "Neon", "Mellow", "Snappy", "Groovy", "Pixel"];
+const NAME_ANIMALS = ["Otter", "Panda", "Falcon", "Gecko", "Walrus", "Badger", "Puffin", "Moose", "Heron", "Lynx"];
+
+function randomName() {
+  const pick = (list) => list[Math.floor(Math.random() * list.length)];
+  return pick(NAME_ADJECTIVES) + pick(NAME_ANIMALS);
 }
 
-function editUsername() {
-  const newName = prompt("Enter your name:", username);
-  if (newName === null) return;
-  const trimmed = newName.trim().slice(0, 20);
-  if (!trimmed) return;
+let username = null;
+try { username = localStorage.getItem("yt_username"); } catch {}
+if (!username) {
+  username = randomName();
+  try { localStorage.setItem("yt_username", username); } catch {}
+}
+
+function applyUsername(name) {
+  const trimmed = (name || "").trim().slice(0, 20);
+  if (!trimmed || trimmed === username) return;
   username = trimmed;
-  localStorage.setItem("yt_username", username);
-  document.getElementById("usernameDisplay").textContent = username;
+  try { localStorage.setItem("yt_username", username); } catch {}
+  const display = document.getElementById("usernameDisplay");
+  if (display) display.textContent = username;
+  const field = document.getElementById("nameInput");
+  if (field && field.value !== username) field.value = username;
   if (socket.connected && currentRoomId) socket.emit("update_username", username);
+}
+
+// Reads the lobby field, and never lets it sit empty.
+function commitLobbyName() {
+  const field = document.getElementById("nameInput");
+  if (!field) return;
+  const trimmed = field.value.trim().slice(0, 20);
+  if (trimmed) applyUsername(trimmed);
+  else field.value = username;
+}
+
+// Renaming edits in place. A blocking dialog is a lot of ceremony for a name.
+function editUsername() {
+  const display = document.getElementById("usernameDisplay");
+  if (!display || display.dataset.editing === "1") return;
+  display.dataset.editing = "1";
+
+  const field = document.createElement("input");
+  field.className = "name-edit";
+  field.value = username;
+  field.maxLength = 20;
+
+  let closed = false;
+  const close = (commit) => {
+    if (closed) return;
+    closed = true;
+    const value = field.value;
+    field.replaceWith(display);
+    display.dataset.editing = "";
+    if (commit) applyUsername(value);
+  };
+
+  field.onkeydown = (e) => {
+    if (e.key === "Enter") close(true);
+    if (e.key === "Escape") close(false);
+  };
+  field.onblur = () => close(true);
+
+  display.replaceWith(field);
+  field.focus();
+  field.select();
 }
 
 // -------------------- SOCKET --------------------
@@ -163,6 +213,7 @@ function joinRoomFromInput() {
 }
 
 function enterRoom(roomId) {
+  commitLobbyName();
   currentRoomId = roomId;
   history.replaceState({}, "", "?room=" + roomId);
   document.getElementById("roomCodeDisplay").textContent = roomId;
@@ -237,8 +288,10 @@ function showCopiedTip() {
   setTimeout(() => tip.remove(), 1400);
 }
 
-// Check URL on load, skip lobby if room param present
+// Show the name we picked, then skip the lobby if the URL carries a room
 (function () {
+  const field = document.getElementById("nameInput");
+  if (field) field.value = username;
   const params = new URLSearchParams(location.search);
   const room = params.get("room");
   if (room) enterRoom(room.toUpperCase());

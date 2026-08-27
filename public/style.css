@@ -439,6 +439,23 @@ button:hover {
   font-size: 12px;
   vertical-align: middle;
 }
+.lobby-name {
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+#nameInput {
+  width: min(170px, 100%);
+  text-align: center;
+}
+.name-edit {
+  width: 130px;
+  margin: 0 2px;
+  padding: 1px 4px;
+  font-size: 12px;
+  vertical-align: middle;
+}
+
 .lobby-theme {
   margin-top: 14px;
   font-size: 12px;

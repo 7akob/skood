@@ -31,6 +31,10 @@
 <div id="lobby">
   <h1><span class="logo-sk">Sk</span><span class="logo-badge">ood</span><span class="logo-tagline">watch together</span></h1>
   <div id="lobbyBox">
+    <div class="lobby-name">
+      You are <input id="nameInput" maxlength="20" onchange="commitLobbyName()" onblur="commitLobbyName()">
+    </div>
+
     <h2>Create Room</h2>
     <button onclick="createRoom()">New Room</button>
 
@@ -134,17 +138,17 @@
   <div id="siteFooter">
     <div class="footer-col">
       <strong>Skood</strong>
-      <a href="https://github.com/7akob/skood-2-g">Source</a>
-      <a href="https://github.com/7akob/skood-2-g#readme">About</a>
+      <a href="https://github.com/7akob/skood">Source</a>
+      <a href="https://github.com/7akob/skood#readme">About</a>
     </div>
     <div class="footer-col">
       <strong>Help</strong>
-      <a href="https://github.com/7akob/skood-2-g/issues/new?template=bug_report.yml">Report a bug</a>
-      <a href="https://github.com/7akob/skood-2-g/blob/main/CONTRIBUTING.md">Contribute</a>
+      <a href="https://github.com/7akob/skood/issues/new?template=bug_report.yml">Report a bug</a>
+      <a href="https://github.com/7akob/skood/blob/main/CONTRIBUTING.md">Contribute</a>
     </div>
     <div class="footer-col">
       <strong>Project</strong>
-      <a href="https://github.com/7akob/skood-2-g/issues">Ideas</a>
+      <a href="https://github.com/7akob/skood/issues">Ideas</a>
       <a href="https://buymeacoffee.com/7akob">Support the server</a>
     </div>
     <div class="footer-note">Skood is free and open source. Not affiliated with YouTube.</div>
