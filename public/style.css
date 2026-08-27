@@ -1,40 +1,224 @@
+/* ==========================================================================
+   Skood — themeable stylesheet
+   ---------------------------------------------------------------------------
+   :root holds the token values for the default "yt2008" theme (2008-era
+   video-site look). html[data-theme="neon90s"] overrides the tokens (and,
+   further down, a few structural rules) to restore the neon-90s look.
+   html[data-theme=…] (0,1,1) intentionally out-specifies :root (0,1,0).
+   Theme blocks must only change look (color/background/border/shadow/font/
+   alignment) — never layout properties the mobile media query touches.
+   ========================================================================== */
+
+:root {
+  /* page */
+  --bg-page: #FFFFFF;
+  --font-body: Arial, Helvetica, sans-serif;
+  --font-size-page: 13px;
+  --page-align: left;
+  --text-main: #333333;
+  --text-muted: #666666;
+  --text-faint: #999999;
+  --text-empty: #999999;
+  --emph: #000000;
+
+  /* headings */
+  --h1-color: #000000;
+  --h1-shadow: none;
+  --h1-size: 24px;
+  --h2-color: #333333;
+  --h2-shadow: none;
+  --fav-h2: #333333;
+
+  /* controls */
+  --control-font: Arial, Helvetica, sans-serif;
+  --control-size: 13px;
+  --control-padding: 4px 10px;
+  --btn-bg: linear-gradient(#FFFFFF, #DDDDDD);
+  --btn-bg-hover: linear-gradient(#FFFFFF, #CCCCCC);
+  --btn-border: 1px solid #999999;
+  --btn-small-border-w: 1px;
+  --btn-text: #333333;
+  --btn-radius: 3px;
+  --btn-shadow: none;
+  --input-bg: #FFFFFF;
+  --input-border: 1px solid #999999;
+  --input-text: #000000;
+  --loop-on-bg: #D8D8D8;
+  --loop-on-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+
+  /* panels / boxes */
+  --panel-bg: #FFFFFF;
+  --panel-border: 1px solid #CCCCCC;
+  --panel-border-heavy: 1px solid #CCCCCC;
+  --panel-fav-border: 1px solid #CCCCCC;
+  --glow-panel: none;
+  --glow-panel-fav: none;
+  --glow-box: none;
+  --chat-inset: none;
+  --panel-head-bg: linear-gradient(#F8F8F8, #E4E4E4);
+
+  /* rows / thumbs / player */
+  --row-line: 1px solid #E8E8E8;
+  --row-line-fav: 1px solid #E8E8E8;
+  --msg-line: 1px solid #EEEEEE;
+  --thumb-border: 1px solid #CCCCCC;
+  --thumb-border-fav: 1px solid #CCCCCC;
+  --player-border: 1px solid #999999;
+  --player-glow: none;
+
+  /* status / icons */
+  --ok: #339933;
+  --ok-glow: none;
+  --warn: #CC6600;
+  --warn-glow: none;
+  --danger: #990000;
+  --star: #E6A33D;
+  --star-hover: #CC0000;
+  --icon-btn: #666666;
+  --icon-btn-hover: #0033CC;
+  --now-color: #000000;
+
+  /* chat */
+  --chat-time: #999999;
+  --chat-name: #0033CC;
+  --chat-name-self: #CC0000;
+  --chat-text: #333333;
+  --sys-bg: #FFF8C6;
+  --sys-border-color: #E3D68A;
+  --sys-text: #6B5900;
+  --tip-bg: #FFFFE1;
+  --tip-text: #000000;
+  --tip-border: 1px solid #999999;
+}
+
+/* Legacy neon-90s theme: today's exact values */
+html[data-theme="neon90s"] {
+  --bg-page: #000080;
+  --font-body: "Comic Sans MS", Tahoma, sans-serif;
+  --font-size-page: 16px;
+  --page-align: center;
+  --text-main: #00FFEA;
+  --text-muted: #888;
+  --text-faint: #777;
+  --text-empty: #555;
+  --emph: #FFFF00;
+
+  --h1-color: #FFFF00;
+  --h1-shadow: 2px 2px #FF00FF;
+  --h1-size: clamp(24px, 7vw, 40px);
+  --h2-color: #00FF00;
+  --h2-shadow: 1px 1px black;
+  --fav-h2: #FF00FF;
+
+  --control-font: "Comic Sans MS", Arial;
+  --control-size: 16px;
+  --control-padding: 8px;
+  --btn-bg: linear-gradient(90deg, #00FFFF, #FF00FF);
+  --btn-bg-hover: linear-gradient(90deg, #FFFF00, #00FF00);
+  --btn-border: 3px solid #FF00FF;
+  --btn-small-border-w: 2px;
+  --btn-text: black;
+  --btn-radius: 5px;
+  --btn-shadow: 2px 2px 4px black;
+  --input-bg: #FFFFCC;
+  --input-border: 3px solid #FF00FF;
+  --input-text: black;
+  --loop-on-bg: linear-gradient(90deg, #FFFF00, #00FF00);
+  --loop-on-shadow: 0 0 6px #00FF00;
+
+  --panel-bg: rgba(0, 0, 0, 0.5);
+  --panel-border: 3px ridge #00FFFF;
+  --panel-border-heavy: 4px ridge #00FFFF;
+  --panel-fav-border: 3px ridge #FF00FF;
+  --glow-panel: 0 0 10px #00FFFF;
+  --glow-panel-fav: 0 0 10px #FF00FF;
+  --glow-box: 0 0 20px #00FFFF;
+  --chat-inset: inset 0 0 10px #00FFFF;
+  --panel-head-bg: none;
+
+  --row-line: 1px dotted #00FFFF;
+  --row-line-fav: 1px dotted #FF00FF;
+  --msg-line: 1px dotted #00FFFF;
+  --thumb-border: 1px solid #00FFFF;
+  --thumb-border-fav: 1px solid #FF00FF;
+  --player-border: 5px double #FFFF00;
+  --player-glow: 0 0 20px #FF00FF;
+
+  --ok: #00FF00;
+  --ok-glow: 0 0 4px #00FF00;
+  --warn: #FF6600;
+  --warn-glow: 0 0 4px #FF6600;
+  --danger: #FF6666;
+  --star: #FFFF00;
+  --star-hover: #FF00FF;
+  --icon-btn: #00FFEA;
+  --icon-btn-hover: #FF00FF;
+  --now-color: #FFFF00;
+
+  --chat-time: #FFFF00;
+  --chat-name: #00FFEA;
+  --chat-name-self: #00FF00;
+  --chat-text: #FFFFFF;
+  --sys-bg: transparent;
+  --sys-border-color: #333;
+  --sys-text: #888;
+  --tip-bg: #00FF00;
+  --tip-text: black;
+  --tip-border: none;
+}
+
+/* ===================== BASE ===================== */
+
 * { box-sizing: border-box; }
 
 body {
-  background: #000080;
-  font-family: "Comic Sans MS", "Tahoma", sans-serif;
-  color: #00FFEA;
-  text-align: center;
+  background: var(--bg-page);
+  font-family: var(--font-body);
+  font-size: var(--font-size-page);
+  color: var(--text-main);
+  text-align: var(--page-align);
   padding: 20px;
   margin: 0;
 }
 
 h1 {
-  color: #FFFF00;
-  text-shadow: 2px 2px #FF00FF;
-  font-size: clamp(24px, 7vw, 40px);
+  color: var(--h1-color);
+  text-shadow: var(--h1-shadow);
+  font-size: var(--h1-size);
   margin-bottom: 6px;
 }
 
 h2 {
-  color: #00FF00;
-  text-shadow: 1px 1px black;
+  color: var(--h2-color);
+  text-shadow: var(--h2-shadow);
 }
 
-input, button {
-  font-family: "Comic Sans MS", Arial;
-  font-size: 16px;
-  padding: 8px;
-  border: 3px solid #FF00FF;
-  background: linear-gradient(90deg, #00FFFF, #FF00FF);
-  color: black;
+input, select {
+  font-family: var(--control-font);
+  font-size: var(--control-size);
+  padding: var(--control-padding);
+  border: var(--input-border);
+  background: var(--input-bg);
+  color: var(--input-text);
   margin: 5px;
-  border-radius: 5px;
-  box-shadow: 2px 2px 4px black;
+  border-radius: var(--btn-radius);
+  box-shadow: var(--btn-shadow);
+}
+
+button {
+  font-family: var(--control-font);
+  font-size: var(--control-size);
+  padding: var(--control-padding);
+  border: var(--btn-border);
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  margin: 5px;
+  border-radius: var(--btn-radius);
+  box-shadow: var(--btn-shadow);
 }
 
 button:hover {
-  background: linear-gradient(90deg, #FFFF00, #00FF00);
+  background: var(--btn-bg-hover);
   cursor: pointer;
 }
 
@@ -57,10 +241,10 @@ button:hover {
 }
 
 #lobbyBox {
-  border: 4px ridge #00FFFF;
-  background: rgba(0,0,0,0.5);
+  border: var(--panel-border-heavy);
+  background: var(--panel-bg);
   padding: 24px 20px;
-  box-shadow: 0 0 20px #00FFFF;
+  box-shadow: var(--glow-box);
 }
 
 #lobbyBox h2 {
@@ -81,8 +265,6 @@ button:hover {
 
 #roomJoinInput {
   width: min(200px, 100%);
-  background: #FFFFCC;
-  color: black;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-size: 18px;
@@ -95,12 +277,12 @@ button:hover {
 /* ---- Room bar ---- */
 #roomBar {
   font-size: 13px;
-  color: #00FFEA;
+  color: var(--text-main);
   margin-bottom: 6px;
 }
 
 #roomCodeDisplay {
-  color: #FFFF00;
+  color: var(--emph);
   font-weight: bold;
   letter-spacing: 2px;
   font-size: 15px;
@@ -109,12 +291,12 @@ button:hover {
 /* ---- User bar ---- */
 #userBar {
   font-size: 13px;
-  color: #00FFEA;
+  color: var(--text-main);
   margin-bottom: 10px;
 }
 
 #usernameDisplay {
-  color: #FFFF00;
+  color: var(--emph);
   font-weight: bold;
 }
 
@@ -135,15 +317,15 @@ button:hover {
   cursor: default;
   pointer-events: none;
 }
-.btn-leave { color: #FF6666; }
+.btn-leave { color: var(--danger); }
 
 /* ---- Presence ---- */
 #presenceBar {
   font-size: 12px;
-  color: #888;
+  color: var(--text-muted);
   margin-bottom: 10px;
 }
-#presenceList { color: #00FFEA; }
+#presenceList { color: var(--text-main); }
 
 /* ---- "Copied!" tooltip on the link button ---- */
 .copied-tip {
@@ -152,8 +334,9 @@ button:hover {
   left: 50%;
   transform: translateX(-50%);
   margin-bottom: 4px;
-  background: #00FF00;
-  color: black;
+  background: var(--tip-bg);
+  border: var(--tip-border);
+  color: var(--tip-text);
   font-size: 11px;
   font-weight: bold;
   padding: 2px 6px;
@@ -173,15 +356,15 @@ button:hover {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #00FF00;
+  background: var(--ok);
   vertical-align: middle;
   margin-left: 8px;
-  box-shadow: 0 0 4px #00FF00;
+  box-shadow: var(--ok-glow);
   transition: background 0.3s, box-shadow 0.3s;
 }
 #connDot.disconnected {
-  background: #FF6600;
-  box-shadow: 0 0 4px #FF6600;
+  background: var(--warn);
+  box-shadow: var(--warn-glow);
   animation: connBlink 1s infinite;
 }
 @keyframes connBlink {
@@ -202,30 +385,28 @@ button:hover {
   flex: 1 1 200px;
   max-width: 400px;
   min-width: 0;
-  background: #FFFFCC;
-  color: black;
 }
 
 /* ---- Now Playing ---- */
 #nowPlaying {
   font-size: 15px;
-  color: #FFFF00;
+  color: var(--now-color);
   margin: 8px 0 4px;
   min-height: 24px;
 }
 #nowTitle { vertical-align: middle; }
 
-#starBtn { font-size: 22px; color: #FFFF00; }
-#starBtn:hover { color: #FF00FF; }
-#renameBtn { font-size: 16px; color: #00FFEA; }
-#renameBtn:hover { color: #FF00FF; }
-#replayBtn { font-size: 20px; color: #00FFEA; }
-#replayBtn:hover { color: #FF00FF; }
+#starBtn { font-size: 22px; color: var(--star); }
+#starBtn:hover { color: var(--star-hover); }
+#renameBtn { font-size: 16px; color: var(--icon-btn); }
+#renameBtn:hover { color: var(--icon-btn-hover); }
+#replayBtn { font-size: 20px; color: var(--icon-btn); }
+#replayBtn:hover { color: var(--icon-btn-hover); }
 
 /* ---- Loop toggle (active = shared room state, on for everyone) ---- */
 #loopBtn.active {
-  background: linear-gradient(90deg, #FFFF00, #00FF00) !important;
-  box-shadow: 0 0 6px #00FF00 !important;
+  background: var(--loop-on-bg) !important;
+  box-shadow: var(--loop-on-shadow) !important;
 }
 
 /* ---- Responsive player wrapper ---- */
@@ -243,8 +424,8 @@ button:hover {
   height: 100% !important;
 }
 #player {
-  border: 5px double #FFFF00;
-  box-shadow: 0 0 20px #FF00FF;
+  border: var(--player-border);
+  box-shadow: var(--player-glow);
 }
 
 /* ---- Queue & Favorites panels ---- */
@@ -259,17 +440,17 @@ button:hover {
 
 #queuePanel, #favoritesPanel {
   flex: 1;
-  border: 3px ridge #00FFFF;
-  background: rgba(0,0,0,0.5);
+  border: var(--panel-border);
+  background: var(--panel-bg);
   padding: 10px;
-  box-shadow: 0 0 10px #00FFFF;
+  box-shadow: var(--glow-panel);
   min-height: 120px;
   max-height: 280px;
   overflow-y: auto;
 }
 #favoritesPanel {
-  border-color: #FF00FF;
-  box-shadow: 0 0 10px #FF00FF;
+  border: var(--panel-fav-border);
+  box-shadow: var(--glow-panel-fav);
 }
 
 .panel-header {
@@ -277,27 +458,28 @@ button:hover {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
+  background: var(--panel-head-bg);
 }
 .panel-header h2 { margin: 0; font-size: 18px; }
-#favoritesPanel .panel-header h2 { color: #FF00FF; }
+#favoritesPanel .panel-header h2 { color: var(--fav-h2); }
 
 .queue-item, .fav-item {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 4px 0;
-  border-bottom: 1px dotted #00FFFF;
+  border-bottom: var(--row-line);
 }
-.fav-item { border-bottom-color: #FF00FF; }
+.fav-item { border-bottom: var(--row-line-fav); }
 
 .queue-item img, .fav-item img {
   width: 72px;
   height: 54px;
   object-fit: cover;
-  border: 1px solid #00FFFF;
+  border: var(--thumb-border);
   flex-shrink: 0;
 }
-.fav-item img { border-color: #FF00FF; }
+.fav-item img { border: var(--thumb-border-fav); }
 
 .item-meta {
   flex: 1;
@@ -307,60 +489,59 @@ button:hover {
   gap: 2px;
 }
 .item-title {
-  color: #00FFEA;
+  color: var(--text-main);
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.item-by { font-size: 10px; color: #777; font-style: italic; }
+.item-by { font-size: 10px; color: var(--text-faint); font-style: italic; }
 
 .btn-small {
   font-size: 11px !important;
   padding: 2px 5px !important;
   margin: 1px !important;
-  border-width: 2px !important;
+  border-width: var(--btn-small-border-w) !important;
   flex-shrink: 0;
   white-space: nowrap;
 }
-.panel-empty { color: #555; font-size: 13px; font-style: italic; }
+.panel-empty { color: var(--text-empty); font-size: 13px; font-style: italic; }
 
 /* ---- Chat ---- */
 #chatBox {
-  border: 4px ridge #00FFFF;
-  background: rgba(0,0,0,0.5);
+  border: var(--panel-border-heavy);
+  background: var(--panel-bg);
   width: min(350px, 100%);
   height: 250px;
   margin: 0 auto;
-  color: #00FFEA;
+  color: var(--text-main);
   overflow-y: auto;
   padding: 10px;
   font-size: 14px;
-  box-shadow: inset 0 0 10px #00FFFF;
+  box-shadow: var(--chat-inset);
 }
 #chatInput {
   width: min(250px, 70%);
-  background: #FFFFCC;
-  color: black;
 }
 
 .message {
   padding: 4px;
   margin: 2px 0;
-  border-bottom: 1px dotted #00FFFF;
-  font-family: "Comic Sans MS", Tahoma, sans-serif;
+  border-bottom: var(--msg-line);
+  font-family: var(--font-body);
   text-align: left;
 }
-.msg-time { color: #FFFF00; }
-.msg-name { color: #00FFEA; }
-.msg-name.is-self { color: #00FF00; }
-.msg-text { color: #FFFFFF; }
+.msg-time { color: var(--chat-time); }
+.msg-name { color: var(--chat-name); }
+.msg-name.is-self { color: var(--chat-name-self); }
+.msg-text { color: var(--chat-text); }
+
 .sys-message {
   padding: 3px 4px;
   margin: 2px 0;
-  border-bottom: 1px dotted #333;
+  border-bottom: 1px dotted var(--sys-border-color);
   font-size: 12px;
-  color: #888;
+  color: var(--sys-text);
   font-style: italic;
   text-align: left;
 }
