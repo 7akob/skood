@@ -30,6 +30,8 @@ self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
   const url = new URL(e.request.url);
   if (url.origin !== self.location.origin) return;
+  // Never cache the live rooms count — a stale number is worse than none
+  if (url.pathname === "/stats") return;
 
   // Network first — fall back to cache if offline
   e.respondWith(

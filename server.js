@@ -6,6 +6,12 @@ const { Server } = require("socket.io");
 const app = express();
 app.use(express.static("public"));
 
+// Aggregate-only lobby stat: how many rooms are open right now.
+// Deliberately nothing else — no names, no per-room data, no history.
+app.get("/stats", (req, res) => {
+  res.json({ rooms: Object.keys(rooms).length });
+});
+
 const server = http.createServer(app);
 const io = new Server(server, {
   transports: ["websocket"],

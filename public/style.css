@@ -346,6 +346,12 @@ button:hover {
   font-size: 12px;
   color: var(--text-muted);
 }
+.lobby-stats {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  min-height: 15px;
+}
 
 /* ---- Presence ---- */
 #presenceBar {

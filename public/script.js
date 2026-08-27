@@ -179,6 +179,20 @@ function leaveRoom() {
   document.getElementById("lobby").style.display = "block";
   document.getElementById("roomJoinInput").value = "";
   renderPresence([]);
+  updateLobbyStats();
+}
+
+// Aggregate-only: the server reports how many rooms are open, nothing else.
+// Shown in the lobby when > 0; errors leave the line empty.
+async function updateLobbyStats() {
+  const el = document.getElementById("lobbyStats");
+  if (!el) return;
+  try {
+    const res = await fetch("/stats");
+    if (!res.ok) return;
+    const { rooms } = await res.json();
+    el.textContent = rooms > 0 ? `🟢 ${rooms} ${rooms === 1 ? "room" : "rooms"} watching right now` : "";
+  } catch { /* leave empty */ }
 }
 
 function renderPresence(users) {
@@ -214,6 +228,7 @@ function showCopiedTip() {
   const params = new URLSearchParams(location.search);
   const room = params.get("room");
   if (room) enterRoom(room.toUpperCase());
+  else updateLobbyStats();
 })();
 
 // -------------------- PAGE VISIBILITY --------------------
