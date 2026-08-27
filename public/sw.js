@@ -1,5 +1,5 @@
 // Service worker — caches the app shell for fast/offline load
-const CACHE = "skood-v2";
+const CACHE = "skood-v3";
 const SHELL = [
   "/",
   "/index.html",

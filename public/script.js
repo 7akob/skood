@@ -6,8 +6,15 @@ if ("serviceWorker" in navigator) {
 // -------------------- THEME --------------------
 // The head snippet in index.html already set data-theme before first paint;
 // this re-apply exists to sync the selects and the meta theme-color.
-// The default theme name lives here AND in that snippet — change both together.
-const THEMES = ["yt2008", "neon90s"];
+// The theme list lives in three places — THEMES, THEME_COLORS, and the head
+// snippet's VALID array — change all of them together.
+const THEMES = ["yt2008", "neon90s", "midnight"];
+// Per-theme meta theme-color; must match each theme's --bg-page.
+const THEME_COLORS = {
+  yt2008: "#FFFFFF",
+  neon90s: "#000080",
+  midnight: "#0B1220"
+};
 function getTheme() {
   try {
     const t = localStorage.getItem("yt_theme");
@@ -20,7 +27,7 @@ function saveTheme(t) {
 function applyTheme(t) {
   document.documentElement.dataset.theme = t;
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", t === "neon90s" ? "#000080" : "#FFFFFF");
+  if (meta) meta.setAttribute("content", THEME_COLORS[t] || THEME_COLORS.yt2008);
   document.querySelectorAll(".theme-select").forEach((s) => { s.value = t; });
 }
 function changeTheme(t) {

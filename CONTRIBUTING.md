@@ -37,10 +37,17 @@ username):
   thumbnails all work without API keys. Don't introduce features that need
   credentials.
 - **Themes:** all colors live as CSS custom properties at the top of
-  `public/style.css`. The default `yt2008` values sit on `:root`; the
-  `neon90s` theme overrides them in `html[data-theme="neon90s"]` blocks. If
-  you change a base structural rule, mirror it in the neon section — and never
-  put layout properties (the ones the mobile media query touches) in theme
-  blocks.
+  `public/style.css`. `:root` holds the default `yt2008` values; every other
+  theme is one `html[data-theme="NAME"]` token block up top plus (if it
+  reshapes anything) a structural override section above the mobile media
+  query — see `neon90s` and `midnight` for the two patterns. Rules: theme
+  blocks change *look* only, never layout properties the mobile media query
+  touches; if you change a base structural rule, mirror it in **every**
+  theme's structural section. Adding a theme means: token block, structural
+  mirrors, an `<option>` in both `.theme-select`s in `index.html`, entries in
+  `THEMES` and `THEME_COLORS` in `script.js`, the head snippet's `VALID` list
+  in `index.html`, a service-worker cache-name bump in `sw.js`, and a
+  screenshot for the README table. (`manifest.json` intentionally stays on
+  the default theme's colors — it's a static file.)
 - Small, focused pull requests are easiest to review. For a bigger idea, open
   an issue first so we can talk about it.

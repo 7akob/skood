@@ -10,6 +10,8 @@
    ========================================================================== */
 
 :root {
+  color-scheme: light;
+
   /* page */
   --bg-page: #FFFFFF;
   --font-body: Arial, Helvetica, sans-serif;
@@ -58,6 +60,7 @@
   --panel-head-bg: linear-gradient(#F8F8F8, #E4E4E4);
 
   /* rows / thumbs / player */
+  --divider-bg: #DDDDDD;
   --row-line: 1px solid #E8E8E8;
   --row-line-fav: 1px solid #E8E8E8;
   --msg-line: 1px solid #EEEEEE;
@@ -167,6 +170,92 @@ html[data-theme="neon90s"] {
   --tip-border: none;
 }
 
+/* Modern dark theme: slate surfaces, indigo accent, soft radii */
+html[data-theme="midnight"] {
+  color-scheme: dark; /* dark scrollbars + native <select> popup */
+
+  /* page */
+  --bg-page: #0B1220;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-size-page: 14px;
+  --page-align: left;
+  --text-main: #E2E8F0;
+  --text-muted: #94A3B8;
+  --text-faint: #94A3B8; /* .item-by is 10px italic — needs full muted brightness */
+  --text-empty: #7E8CA3;
+  --emph: #F8FAFC;
+
+  /* headings */
+  --h1-color: #F1F5F9;
+  --h1-shadow: none;
+  --h1-size: 24px;
+  --h2-color: #E2E8F0;
+  --h2-shadow: none;
+  --fav-h2: #E2E8F0;
+
+  /* controls */
+  --control-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --control-size: 13px;
+  --control-padding: 6px 14px;
+  --btn-bg: #1E293B;
+  --btn-bg-hover: #273449;
+  --btn-border: 1px solid #334155;
+  --btn-small-border-w: 1px;
+  --btn-text: #E2E8F0;
+  --btn-radius: 8px;
+  --btn-shadow: 0 1px 2px rgba(2, 6, 23, 0.45);
+  --input-bg: #0B1220; /* page-dark inputs read "recessed" inside panels */
+  --input-border: 1px solid #334155;
+  --input-text: #F1F5F9;
+  --loop-on-bg: #4F46E5; /* accent = shared-state ON */
+  --loop-on-shadow: inset 0 1px 2px rgba(2, 6, 23, 0.5);
+
+  /* panels / boxes — glows become soft elevation */
+  --panel-bg: #141D2F;
+  --panel-border: 1px solid #263349;
+  --panel-border-heavy: 1px solid #263349;
+  --panel-fav-border: 1px solid #263349;
+  --glow-panel: 0 4px 16px rgba(2, 6, 23, 0.35);
+  --glow-panel-fav: 0 4px 16px rgba(2, 6, 23, 0.35);
+  --glow-box: 0 8px 32px rgba(2, 6, 23, 0.45);
+  --chat-inset: 0 4px 16px rgba(2, 6, 23, 0.35);
+  --panel-head-bg: none; /* flat card header; the hairline does the work */
+
+  /* rows / thumbs / player */
+  --divider-bg: #1F2A3D;
+  --row-line: 1px solid rgba(148, 163, 184, 0.12);
+  --row-line-fav: 1px solid rgba(148, 163, 184, 0.12);
+  --msg-line: none; /* modern chat: whitespace, no rules between messages */
+  --thumb-border: 1px solid rgba(148, 163, 184, 0.15);
+  --thumb-border-fav: 1px solid rgba(148, 163, 184, 0.15);
+  --player-border: 1px solid #263349;
+  --player-glow: 0 8px 24px rgba(2, 6, 23, 0.45);
+
+  /* status / icons */
+  --ok: #34D399;
+  --ok-glow: 0 0 0 3px rgba(52, 211, 153, 0.15);
+  --warn: #FBBF24;
+  --warn-glow: 0 0 0 3px rgba(251, 191, 36, 0.15);
+  --danger: #F87171;
+  --star: #FBBF24;
+  --star-hover: #FCD34D; /* hover = brighten, not hue-swap */
+  --icon-btn: #94A3B8;
+  --icon-btn-hover: #A5B4FC;
+  --now-color: #F1F5F9;
+
+  /* chat */
+  --chat-time: #7E8CA3;
+  --chat-name: #E2E8F0;
+  --chat-name-self: #A5B4FC;
+  --chat-text: #CBD5E1;
+  --sys-bg: rgba(129, 140, 248, 0.08);
+  --sys-border-color: #818CF8;
+  --sys-text: #94A3B8;
+  --tip-bg: #1E293B;
+  --tip-text: #F1F5F9;
+  --tip-border: 1px solid #334155;
+}
+
 /* ===================== BASE ===================== */
 
 * { box-sizing: border-box; }
@@ -245,7 +334,7 @@ button:hover {
   margin: 20px 0;
   width: 100%;
   height: 1px;
-  background: #DDDDDD;
+  background: var(--divider-bg);
 }
 
 /* ===================== LOBBY ===================== */
@@ -271,7 +360,7 @@ button:hover {
   margin: 18px auto;
   width: 80%;
   height: 1px;
-  background: #DDDDDD;
+  background: var(--divider-bg);
 }
 
 #roomJoinInput {
@@ -653,6 +742,52 @@ html[data-theme="neon90s"] .sys-message {
   border-bottom: 1px dotted var(--sys-border-color);
   border-radius: 0;
   font-style: italic;
+}
+
+/* ==========================================================================
+   Midnight structural overrides — modern card treatment. Look-only;
+   color-bearing values route through tokens so a future light sibling
+   ("daylight") could reuse these rules as a pure token delta.
+   ========================================================================== */
+
+html[data-theme="midnight"] h1 { border-bottom: var(--panel-border); }
+
+/* Wordmark: indigo rounded chip — still Skood's own mark, not the red badge */
+html[data-theme="midnight"] .logo-badge {
+  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+  color: #FFFFFF;
+  border-radius: 8px;
+  padding: 0 8px;
+}
+html[data-theme="midnight"] .logo-tagline {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 10px;
+}
+
+/* Soft rounded cards (base panels have no radius) */
+html[data-theme="midnight"] #lobbyBox,
+html[data-theme="midnight"] #queuePanel,
+html[data-theme="midnight"] #favoritesPanel,
+html[data-theme="midnight"] #chatBox { border-radius: 12px; }
+
+/* Card header keeps the base's full-bleed structure; only the hardcoded
+   2008 hairline color needs replacing */
+html[data-theme="midnight"] .panel-header { border-bottom: var(--panel-border); }
+
+/* The panel is already titled "Favorites" — no star garnish */
+html[data-theme="midnight"] #favoritesPanel .panel-header h2::before { content: none; }
+
+/* Rounded thumbnails and player frame */
+html[data-theme="midnight"] .queue-item img,
+html[data-theme="midnight"] .fav-item img { border-radius: 6px; }
+html[data-theme="midnight"] #player { border-radius: 12px; }
+
+/* System messages: left-accent line over a faint tint, not the yellow strip */
+html[data-theme="midnight"] .sys-message {
+  border: none;
+  border-left: 2px solid var(--sys-border-color);
+  border-radius: 0 6px 6px 0;
 }
 
 /* ---- Mobile ---- */

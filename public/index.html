@@ -10,12 +10,14 @@
   <link rel="manifest" href="/manifest.json">
   <script>
     // Apply the saved theme before the stylesheet loads so the first paint
-    // is already in the right theme (no flash of the wrong one). The same
-    // default lives in getTheme() in script.js — change both together.
+    // is already in the right theme (no flash of the wrong one). The theme
+    // list lives in three places — here, THEMES, and THEME_COLORS in
+    // script.js — change all of them together.
     (function () {
       var t = null;
       try { t = localStorage.getItem("yt_theme"); } catch (e) {}
-      document.documentElement.dataset.theme = (t === "neon90s") ? "neon90s" : "yt2008";
+      var VALID = ["yt2008", "neon90s", "midnight"];
+      document.documentElement.dataset.theme = VALID.indexOf(t) !== -1 ? t : "yt2008";
     })();
   </script>
   <link rel="stylesheet" href="style.css">
@@ -45,6 +47,7 @@
       <select class="theme-select" onchange="changeTheme(this.value)">
         <option value="yt2008">Classic 2008</option>
         <option value="neon90s">Neon 90s</option>
+        <option value="midnight">Midnight</option>
       </select>
     </div>
 
@@ -70,6 +73,7 @@
     <select class="theme-select" onchange="changeTheme(this.value)" title="Theme">
       <option value="yt2008">Classic 2008</option>
       <option value="neon90s">Neon 90s</option>
+      <option value="midnight">Midnight</option>
     </select>
   </div>
 
