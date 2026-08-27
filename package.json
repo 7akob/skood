@@ -1,16 +1,37 @@
 {
   "name": "skood-2-g",
   "version": "1.0.0",
-  "description": "Youtube watch together",
-  "main": "index.js",
+  "description": "Skood — watch YouTube together in synced rooms. Zero build step, no database, no API keys.",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "test": "node --check server.js && node --check public/script.js && node --check public/sw.js"
   },
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "watch-together",
+    "watch-party",
+    "youtube",
+    "socket.io",
+    "sync",
+    "rooms",
+    "retro",
+    "pwa"
+  ],
+  "author": "Jakob (https://github.com/7akob)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/7akob/skood-2-g.git"
+  },
+  "homepage": "https://github.com/7akob/skood-2-g#readme",
+  "bugs": {
+    "url": "https://github.com/7akob/skood-2-g/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "express": "^5.2.1",
-    "http": "^0.0.1-security",
     "socket.io": "^4.8.1"
   }
 }
