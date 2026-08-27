@@ -46,14 +46,14 @@ let username = localStorage.getItem("yt_username");
 if (!username) {
   let entered = "";
   while (!entered) {
-    entered = (prompt("Välkommen! Vad heter du?") || "").trim().slice(0, 20);
+    entered = (prompt("Welcome! What's your name?") || "").trim().slice(0, 20);
   }
   username = entered;
   localStorage.setItem("yt_username", username);
 }
 
 function editUsername() {
-  const newName = prompt("Ange ditt namn:", username);
+  const newName = prompt("Enter your name:", username);
   if (newName === null) return;
   const trimmed = newName.trim().slice(0, 20);
   if (!trimmed) return;
@@ -73,7 +73,7 @@ const socket = io({ transports: ["websocket"] });
 
 function setConnected(connected) {
   const dot = document.getElementById("connDot");
-  dot.title = connected ? "Ansluten" : "Återansluter...";
+  dot.title = connected ? "Connected" : "Reconnecting...";
   dot.classList.toggle("disconnected", !connected);
 }
 
@@ -190,10 +190,10 @@ function renderPresence(users) {
 function copyRoomLink() {
   const url = location.origin + "?room=" + currentRoomId;
   navigator.clipboard.writeText(url).then(() => {
-    appendSystemMessage("Länk kopierad: " + url);
+    appendSystemMessage("Link copied: " + url);
     showCopiedTip();
   }).catch(() => {
-    prompt("Kopiera länken:", url);
+    prompt("Copy the link:", url);
   });
 }
 
@@ -204,7 +204,7 @@ function showCopiedTip() {
   if (existing) existing.remove();
   const tip = document.createElement("span");
   tip.className = "copied-tip";
-  tip.textContent = "Kopierad!";
+  tip.textContent = "Copied!";
   btn.appendChild(tip);
   setTimeout(() => tip.remove(), 1400);
 }
@@ -309,7 +309,7 @@ function playFromQueue(qid, id) {
 function skipVideo() { socket.emit("skip_video", username); }
 
 function clearQueue() {
-  if (currentQueueLength > 0 && !confirm(`Rensa kön (${currentQueueLength} videor)? Går inte att ångra.`)) return;
+  if (currentQueueLength > 0 && !confirm(`Clear the queue (${currentQueueLength} videos)? This can't be undone.`)) return;
   socket.emit("clear_queue", username);
 }
 
@@ -321,7 +321,7 @@ function updateLoopBtn() {
   const btn = document.getElementById("loopBtn");
   if (!btn) return;
   btn.classList.toggle("active", loopEnabled);
-  btn.title = loopEnabled ? "Upprepning: PÅ" : "Upprepa nuvarande video";
+  btn.title = loopEnabled ? "Loop: ON" : "Loop current video";
 }
 
 function playAgain() {
@@ -374,20 +374,20 @@ function resetSuppress() { setTimeout(() => suppressEvents = false, 300); }
 // uploader (error codes per the IFrame API docs).
 function onPlayerError(event) {
   const messages = {
-    2: "Ogiltig video-länk.",
-    5: "Videon kan inte spelas upp i den här spelaren.",
-    100: "Videon hittades inte (borttagen eller privat).",
-    101: "Ägaren tillåter inte att videon spelas på andra sidor.",
-    150: "Ägaren tillåter inte att videon spelas på andra sidor."
+    2: "Invalid video link.",
+    5: "This video can't be played in this player.",
+    100: "Video not found (removed or private).",
+    101: "The owner doesn't allow this video to be played on other sites.",
+    150: "The owner doesn't allow this video to be played on other sites."
   };
-  appendSystemMessage("⚠ " + (messages[event.data] || "Videon kunde inte laddas."));
+  appendSystemMessage("⚠ " + (messages[event.data] || "The video couldn't be loaded."));
 }
 
 // -------------------- NOW PLAYING + FAVORITES --------------------
 async function setNowPlaying(id, { announce = false } = {}) {
   currentVideoId = id;
   currentVideoTitle = null;
-  document.getElementById("nowTitle").textContent = "Laddar...";
+  document.getElementById("nowTitle").textContent = "Loading...";
   updateStarBtn();
   bumpFavoritePlayCount(id);
   const title = await fetchTitle(id);
@@ -396,14 +396,14 @@ async function setNowPlaying(id, { announce = false } = {}) {
   document.getElementById("nowTitle").textContent = title;
   updateStarBtn();
   updateMediaSession(title, id);
-  if (announce) socket.emit("system_message", `${username} laddade "${title}"`);
+  if (announce) socket.emit("system_message", `${username} loaded "${title}"`);
 }
 
 function updateMediaSession(title, id) {
   if (!("mediaSession" in navigator)) return;
   navigator.mediaSession.metadata = new MediaMetadata({
     title: title,
-    artist: "Skåda på tv",
+    artist: "Skood",
     artwork: [{ src: `https://img.youtube.com/vi/${id}/hqdefault.jpg`, sizes: "480x360", type: "image/jpeg" }]
   });
   navigator.mediaSession.setActionHandler("play", () => {
@@ -503,7 +503,7 @@ function renderQueue(q) {
   currentQueueLength = q.length;
   const list = document.getElementById("queueList");
   if (q.length === 0) {
-    list.innerHTML = '<span class="panel-empty">Kön är tom</span>';
+    list.innerHTML = '<span class="panel-empty">Queue is empty</span>';
     return;
   }
   list.innerHTML = "";
@@ -525,20 +525,20 @@ function renderQueue(q) {
 
     const byEl = document.createElement("span");
     byEl.className = "item-by";
-    byEl.textContent = "tillagd av " + item.addedBy;
+    byEl.textContent = "added by " + item.addedBy;
 
     meta.append(titleEl, byEl);
 
     const btnPlay = document.createElement("button");
     btnPlay.className = "btn-small";
     btnPlay.textContent = "▶";
-    btnPlay.title = "Spela nu";
+    btnPlay.title = "Play now";
     btnPlay.onclick = () => playFromQueue(item.qid, item.id);
 
     const btnRemove = document.createElement("button");
     btnRemove.className = "btn-small";
     btnRemove.textContent = "✕";
-    btnRemove.title = "Ta bort";
+    btnRemove.title = "Remove";
     btnRemove.onclick = () => removeFromQueue(item.qid);
 
     div.append(thumb, meta, btnPlay, btnRemove);
@@ -550,7 +550,7 @@ function renderFavorites() {
   const favs = getFavorites();
   const list = document.getElementById("favoritesList");
   if (favs.length === 0) {
-    list.innerHTML = '<span class="panel-empty">Inga favoriter än — stjärnmärk en video!</span>';
+    list.innerHTML = '<span class="panel-empty">No favorites yet, star a video!</span>';
     return;
   }
   list.innerHTML = "";
@@ -573,26 +573,26 @@ function renderFavorites() {
     const playsEl = document.createElement("span");
     playsEl.className = "item-by";
     const plays = fav.plays || 0;
-    playsEl.textContent = plays === 1 ? "spelad 1 gång" : `spelad ${plays} gånger`;
+    playsEl.textContent = plays === 1 ? "played once" : `played ${plays} times`;
 
     meta.append(titleEl, playsEl);
 
     const btnLoad = document.createElement("button");
     btnLoad.className = "btn-small";
     btnLoad.textContent = "▶";
-    btnLoad.title = "Spela nu";
+    btnLoad.title = "Play now";
     btnLoad.onclick = () => loadFavorite(fav.id);
 
     const btnQueue = document.createElement("button");
     btnQueue.className = "btn-small";
-    btnQueue.textContent = "+Kö";
-    btnQueue.title = "Lägg till i kö";
+    btnQueue.textContent = "+Queue";
+    btnQueue.title = "Add to queue";
     btnQueue.onclick = () => queueFavorite(fav.id, fav.title);
 
     const btnRemove = document.createElement("button");
     btnRemove.className = "btn-small";
     btnRemove.textContent = "✕";
-    btnRemove.title = "Ta bort från favoriter";
+    btnRemove.title = "Remove from favorites";
     btnRemove.onclick = () => removeFavorite(i);
 
     div.append(thumb, meta, btnLoad, btnQueue, btnRemove);
@@ -618,7 +618,7 @@ function renderChatMessage(data) {
   const safeText = escHtml(text);
   const safeUser = escHtml(user);
   const self = user === username;
-  el.innerHTML = `<span class="msg-time">[${time}]</span> <span class="msg-name${self ? " is-self" : ""}"><b>${self ? "Du" : safeUser}:</b></span> <span class="msg-text">${safeText}</span>`;
+  el.innerHTML = `<span class="msg-time">[${time}]</span> <span class="msg-name${self ? " is-self" : ""}"><b>${self ? "You" : safeUser}:</b></span> <span class="msg-text">${safeText}</span>`;
   box.appendChild(el);
   box.scrollTop = box.scrollHeight;
 }
