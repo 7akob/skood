@@ -1,13 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#FFFFFF">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <title>Skood: watch YouTube together</title>
+  <meta name="description" content="Watch YouTube together in synced rooms. No ads, no accounts, no tracking. Free, open source, and self-hostable in two commands.">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
+
+  <!-- Link previews, for when someone drops a room link into Discord.
+       Self-hosting? These four absolute URLs are the only place the public
+       instance is written down; point them at your own domain. -->
+  <link rel="canonical" href="https://skood.jkb.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Skood">
+  <meta property="og:title" content="Skood: watch YouTube together">
+  <meta property="og:description" content="Synced rooms with a shared queue and chat. No ads, no accounts, no tracking, and nothing to install.">
+  <meta property="og:url" content="https://skood.jkb.app/">
+  <meta property="og:image" content="https://skood.jkb.app/og.png">
+  <meta property="og:image:width" content="2400">
+  <meta property="og:image:height" content="1260">
+  <meta property="og:image:alt" content="Skood: watch YouTube together. No ads, no accounts, no tracking, open source.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Skood: watch YouTube together">
+  <meta name="twitter:description" content="Synced rooms with a shared queue and chat. No ads, no accounts, no tracking, and nothing to install.">
+  <meta name="twitter:image" content="https://skood.jkb.app/og.png">
   <script>
     // Apply the saved theme before the stylesheet loads so the first paint
     // is already in the right theme (no flash of the wrong one). The theme
@@ -24,6 +45,43 @@
   <!-- Served by our own Socket.IO server, always version-matched, no CDN -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
+
+  <!-- Structured data, so search engines and AI assistants can describe
+       Skood accurately rather than guessing from the page text. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Skood",
+    "alternateName": "Skood watch together",
+    "url": "https://skood.jkb.app/",
+    "description": "Skood is a free, open source web app for watching YouTube videos together in synced rooms. Playback, a shared queue and chat stay in sync for everyone in a room. It has no ads, no accounts, no tracking and no database, and can be self-hosted with two commands.",
+    "applicationCategory": "MultimediaApplication",
+    "applicationSubCategory": "Watch party",
+    "operatingSystem": "Any, runs in a web browser",
+    "browserRequirements": "Requires JavaScript and WebSocket support",
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+    "license": "https://opensource.org/licenses/MIT",
+    "codeRepository": "https://github.com/7akob/skood",
+    "programmingLanguage": "JavaScript",
+    "author": {
+      "@type": "Person",
+      "name": "Jakob",
+      "url": "https://github.com/7akob"
+    },
+    "featureList": [
+      "Synced YouTube playback across everyone in a room",
+      "Shareable room codes and links, with no sign-up",
+      "Shared queue with attribution, skip, loop and auto-advance",
+      "Favorites with play counts, stored in the browser",
+      "Presence list and room chat",
+      "Three themes, including a 2008-era YouTube skin",
+      "Installable as a PWA with lock screen media controls",
+      "Self-hostable with Docker or plain Node"
+    ]
+  }
+  </script>
 </head>
 <body>
 

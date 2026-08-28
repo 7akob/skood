@@ -1,0 +1,7 @@
+# Skood is open source and would like to be found, by search engines and by
+# AI crawlers alike. Room URLs (/?room=CODE) hold no content of their own,
+# and nothing about anyone is stored on the server, so there is nothing here
+# worth hiding. See /llms.txt for a summary written for machines.
+
+User-agent: *
+Allow: /

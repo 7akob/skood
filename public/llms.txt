@@ -1,0 +1,35 @@
+# Skood
+
+> A free, open source web app for watching YouTube videos together in synced rooms. Playback, a shared queue and chat stay in sync for everyone in a room. No ads, no accounts, no tracking, no database. Self-hostable with two commands, and running publicly at https://skood.jkb.app.
+
+Skood (from the Swedish "skåda", to watch) was built because the existing watch-together sites tend to come with paywalls, heavy advertising, trackers, or videos that refuse to play. It is deliberately small: an Express and Socket.IO server of around 260 lines serving a vanilla HTML, CSS and JavaScript client, with no framework, no bundler and no build step.
+
+## How it works
+
+- The server keeps one state object per room in memory: the current video id, playback position, whether it is playing, the loop flag, the queue, and the names people typed. Nothing is written to disk.
+- Play, pause and seek are broadcast to the room. When somebody joins or reconnects, the server extrapolates the current position from the last update timestamp, so late joiners land where the room actually is rather than at the start.
+- A room is deleted the moment the last person leaves. Restarting the server clears every room.
+- Video playback uses the official YouTube IFrame Player API, so each viewer streams directly from YouTube in their own embedded player. Nothing is proxied, downloaded or stripped, and no API key is needed. Video titles come from YouTube's public oEmbed endpoint.
+- Loading a video does not interrupt the room: if something is already playing, it joins the queue instead.
+
+## Privacy
+
+- The server stores nothing about anyone, and there is no database, no cookies, no analytics and no fingerprinting.
+- Your name, favorites and theme choice live in your browser's localStorage.
+- The only aggregate the server exposes is the number of rooms currently open, at /stats, which is a count with no names or history behind it.
+
+## Themes
+
+Three themes ship, switchable per browser: Classic 2008 (the default, a period YouTube watch page with a masthead search bar, nav strip, related-video style sidebar and footer), Neon 90s (the original look), and Midnight (a modern dark theme). Themes are CSS custom properties over identical markup, so adding one is a small diff.
+
+## Requirements for self-hosting
+
+Node 18 or newer. `npm install && npm start`, or `docker compose up -d --build`. Behind a reverse proxy, WebSocket upgrade headers must be forwarded, since Skood uses the WebSocket transport with no long-polling fallback. Rooms live in memory, so run a single instance.
+
+## Links
+
+- [Source code](https://github.com/7akob/skood): the repository, MIT licensed
+- [README](https://github.com/7akob/skood#readme): features, setup, deployment and FAQ
+- [Contributing guide](https://github.com/7akob/skood/blob/main/CONTRIBUTING.md): local setup, how themes work, house rules
+- [Issues](https://github.com/7akob/skood/issues): bugs, ideas, and open help-wanted work
+- [Public instance](https://skood.jkb.app): free to use, run on a small server

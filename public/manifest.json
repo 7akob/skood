@@ -1,7 +1,9 @@
 {
-  "name": "Skood",
+  "name": "Skood: watch YouTube together",
   "short_name": "Skood",
-  "description": "Watch YouTube together",
+  "description": "Watch YouTube together in synced rooms. No ads, no accounts, no tracking.",
+  "lang": "en",
+  "categories": ["entertainment", "social"],
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFFFFF",
@@ -15,4 +17,3 @@
     }
   ]
 }
-  

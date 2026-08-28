@@ -77,6 +77,7 @@ Two things matter when you put Skood behind a reverse proxy:
 
 1. WebSockets must be forwarded. Skood uses the WebSocket transport only, with no HTTP long-polling fallback, so a proxy that doesn't forward upgrade headers breaks it completely.
 2. Rooms live in memory. A restart clears them and there is nothing to back up. Run a single instance.
+3. Link previews point at the public instance. `public/index.html` hardcodes `https://skood.jkb.app` in four places (the canonical link, `og:url`, `og:image` and `twitter:image`). Point them at your own domain, or drop them, so shared links preview as your site rather than mine.
 
 **Caddy** (handles WebSockets automatically):
 
