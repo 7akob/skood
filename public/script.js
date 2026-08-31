@@ -395,6 +395,23 @@ async function addToQueue() {
 
 function removeFromQueue(qid) { socket.emit("remove_from_queue", qid); }
 
+function reorderQueue(qid, toIndex) {
+  const fromIndex = currentQueue.findIndex((q) => q.qid === qid);
+  if (fromIndex === -1) return;
+  const targetIndex = Math.max(0, Math.min(currentQueue.length - 1, Math.floor(toIndex)));
+  if (fromIndex === targetIndex) return;
+  const [item] = currentQueue.splice(fromIndex, 1);
+  currentQueue.splice(targetIndex, 0, item);
+  renderQueue();
+  socket.emit("reorder_queue", { qid, toIndex: targetIndex });
+}
+
+function moveQueueItem(qid, delta) {
+  const idx = currentQueue.findIndex((q) => q.qid === qid);
+  if (idx === -1) return;
+  reorderQueue(qid, idx + delta);
+}
+
 function playFromQueue(qid, id) {
   socket.emit("remove_from_queue", qid);
   socket.emit("change_video", id);
@@ -650,6 +667,8 @@ function queueFavorite(id, title) {
   socket.emit("add_to_queue", { id, title, addedBy: username });
 }
 
+let draggedQid = null;
+
 function renderQueue(q = currentQueue) {
   currentQueue = q || [];
   currentQueueLength = currentQueue.length;
@@ -660,9 +679,66 @@ function renderQueue(q = currentQueue) {
   }
   const favs = getFavorites();
   list.innerHTML = "";
-  currentQueue.forEach((item) => {
+  currentQueue.forEach((item, i) => {
     const div = document.createElement("div");
     div.className = "queue-item";
+    div.draggable = true;
+
+    div.addEventListener("dragstart", (e) => {
+      draggedQid = item.qid;
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", item.qid);
+      setTimeout(() => {
+        if (draggedQid === item.qid) {
+          div.classList.add("is-dragging");
+        }
+      }, 0);
+    });
+
+    div.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      if (!draggedQid || draggedQid === item.qid) return;
+      e.dataTransfer.dropEffect = "move";
+      const rect = div.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      if (e.clientY < midY) {
+        div.classList.add("drag-over-top");
+        div.classList.remove("drag-over-bottom");
+      } else {
+        div.classList.add("drag-over-bottom");
+        div.classList.remove("drag-over-top");
+      }
+    });
+
+    div.addEventListener("dragleave", (e) => {
+      if (!div.contains(e.relatedTarget)) {
+        div.classList.remove("drag-over-top", "drag-over-bottom");
+      }
+    });
+
+    div.addEventListener("drop", (e) => {
+      e.preventDefault();
+      div.classList.remove("drag-over-top", "drag-over-bottom");
+      if (!draggedQid || draggedQid === item.qid) return;
+      const fromIdx = currentQueue.findIndex((q) => q.qid === draggedQid);
+      if (fromIdx === -1) return;
+      const rect = div.getBoundingClientRect();
+      const isBefore = e.clientY < rect.top + rect.height / 2;
+      let targetIdx = i;
+      if (isBefore) {
+        targetIdx = fromIdx < i ? i - 1 : i;
+      } else {
+        targetIdx = fromIdx < i ? i : i + 1;
+      }
+      reorderQueue(draggedQid, targetIdx);
+    });
+
+    div.addEventListener("dragend", () => {
+      draggedQid = null;
+      document.querySelectorAll(".queue-item").forEach((el) => {
+        el.classList.remove("is-dragging", "drag-over-top", "drag-over-bottom");
+      });
+    });
 
     const thumb = document.createElement("img");
     thumb.src = `https://img.youtube.com/vi/${item.id}/default.jpg`;
@@ -682,27 +758,61 @@ function renderQueue(q = currentQueue) {
 
     meta.append(titleEl, byEl);
 
-    const isFav = favs.some(f => f.id === item.id);
+    const isFav = favs.some((f) => f.id === item.id);
+
+    const btnUp = document.createElement("button");
+    btnUp.className = "btn-small";
+    btnUp.textContent = "▲";
+    btnUp.title = "Move up";
+    btnUp.disabled = i === 0;
+    btnUp.draggable = false;
+    btnUp.onclick = (e) => {
+      e.stopPropagation();
+      moveQueueItem(item.qid, -1);
+    };
+
+    const btnDown = document.createElement("button");
+    btnDown.className = "btn-small";
+    btnDown.textContent = "▼";
+    btnDown.title = "Move down";
+    btnDown.disabled = i === currentQueue.length - 1;
+    btnDown.draggable = false;
+    btnDown.onclick = (e) => {
+      e.stopPropagation();
+      moveQueueItem(item.qid, 1);
+    };
 
     const btnPlay = document.createElement("button");
     btnPlay.className = "btn-small";
     btnPlay.textContent = "▶";
     btnPlay.title = "Play now";
-    btnPlay.onclick = () => playFromQueue(item.qid, item.id);
+    btnPlay.draggable = false;
+    btnPlay.onclick = (e) => {
+      e.stopPropagation();
+      playFromQueue(item.qid, item.id);
+    };
 
     const btnStar = document.createElement("button");
     btnStar.className = "btn-small";
     btnStar.textContent = isFav ? "★" : "☆";
     btnStar.title = isFav ? "Remove from favorites" : "Add to favorites";
-    btnStar.onclick = () => toggleFavoriteItem(item.id, item.title, item.id === currentVideoId ? 1 : 0);
+    btnStar.draggable = false;
+    btnStar.onclick = (e) => {
+      e.stopPropagation();
+      toggleFavoriteItem(item.id, item.title, item.id === currentVideoId ? 1 : 0);
+    };
 
     const btnRemove = document.createElement("button");
     btnRemove.className = "btn-small";
     btnRemove.textContent = "✕";
     btnRemove.title = "Remove";
-    btnRemove.onclick = () => removeFromQueue(item.qid);
+    btnRemove.draggable = false;
+    btnRemove.onclick = (e) => {
+      e.stopPropagation();
+      removeFromQueue(item.qid);
+    };
 
-    div.append(thumb, meta, btnPlay, btnStar, btnRemove);
+    div.append(thumb, meta, btnUp, btnDown, btnPlay, btnStar, btnRemove);
     list.appendChild(div);
   });
 }
