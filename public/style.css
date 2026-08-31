@@ -712,6 +712,24 @@ button:hover {
 }
 .fav-item { border-bottom: var(--row-line-fav); }
 
+.queue-item {
+  user-select: none;
+  cursor: grab;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+.queue-item:active {
+  cursor: grabbing;
+}
+.queue-item.is-dragging {
+  opacity: 0.35;
+}
+.queue-item.drag-over-top {
+  border-top: 2px solid var(--star);
+}
+.queue-item.drag-over-bottom {
+  border-bottom: 2px solid var(--star);
+}
+
 .queue-item img, .fav-item img {
   width: 72px;
   height: 54px;
@@ -744,6 +762,11 @@ button:hover {
   border-width: var(--btn-small-border-w) !important;
   flex-shrink: 0;
   white-space: nowrap;
+  cursor: pointer;
+}
+.btn-small:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 .panel-empty { color: var(--text-empty); font-size: 13px; font-style: italic; }
 

@@ -190,6 +190,19 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("queue_update", room.queue);
   });
 
+  // Reordering is keyed by qid with a target destination index.
+  socket.on("reorder_queue", (data) => {
+    if (!inRoom() || !data || typeof data.qid !== "string" || typeof data.toIndex !== "number") return;
+    const room = getRoom(roomId);
+    const fromIndex = room.queue.findIndex((q) => q.qid === data.qid);
+    if (fromIndex === -1) return;
+    const targetIndex = Math.max(0, Math.min(room.queue.length - 1, Math.floor(data.toIndex)));
+    if (fromIndex === targetIndex) return;
+    const [item] = room.queue.splice(fromIndex, 1);
+    room.queue.splice(targetIndex, 0, item);
+    io.to(roomId).emit("queue_update", room.queue);
+  });
+
   socket.on("toggle_loop", () => {
     if (!inRoom()) return;
     const room = getRoom(roomId);
