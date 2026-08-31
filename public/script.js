@@ -46,6 +46,7 @@ let currentVideoId = null;
 let currentVideoTitle = null;
 let currentRoomId = null;
 let loopEnabled = false;
+let currentQueue = [];
 let currentQueueLength = 0;
 
 // -------------------- USERNAME --------------------
@@ -583,18 +584,24 @@ function saveFavorites(favs) { localStorage.setItem("yt_favorites", JSON.stringi
 
 function toggleFavorite() {
   if (!currentVideoId) return;
+  // Seed with 1 play since you're favoriting it while it's already
+  // playing; bumpFavoritePlayCount() only fires on future plays.
+  toggleFavoriteItem(currentVideoId, currentVideoTitle || currentVideoId, 1);
+}
+
+function toggleFavoriteItem(id, title, initialPlays = 0) {
+  if (!id) return;
   const favs = getFavorites();
-  const idx = favs.findIndex(f => f.id === currentVideoId);
+  const idx = favs.findIndex(f => f.id === id);
   if (idx >= 0) {
     favs.splice(idx, 1);
   } else {
-    // Seed with 1 play since you're favoriting it while it's already
-    // playing; bumpFavoritePlayCount() only fires on future plays.
-    favs.unshift({ id: currentVideoId, title: currentVideoTitle || currentVideoId, plays: 1 });
+    favs.unshift({ id, title: title || id, plays: initialPlays });
   }
   saveFavorites(favs);
   renderFavorites();
   updateStarBtn();
+  renderQueue();
 }
 
 // Also toggles the replay button's disabled state; both need a
@@ -627,6 +634,7 @@ function removeFavorite(index) {
   saveFavorites(favs);
   renderFavorites();
   updateStarBtn();
+  renderQueue();
 }
 
 function loadFavorite(id) {
@@ -643,15 +651,17 @@ function queueFavorite(id, title) {
   socket.emit("add_to_queue", { id, title, addedBy: username });
 }
 
-function renderQueue(q) {
-  currentQueueLength = q.length;
+function renderQueue(q = currentQueue) {
+  currentQueue = q || [];
+  currentQueueLength = currentQueue.length;
   const list = document.getElementById("queueList");
-  if (q.length === 0) {
+  if (currentQueue.length === 0) {
     list.innerHTML = '<span class="panel-empty">Queue is empty</span>';
     return;
   }
+  const favs = getFavorites();
   list.innerHTML = "";
-  q.forEach((item) => {
+  currentQueue.forEach((item) => {
     const div = document.createElement("div");
     div.className = "queue-item";
 
@@ -673,11 +683,19 @@ function renderQueue(q) {
 
     meta.append(titleEl, byEl);
 
+    const isFav = favs.some(f => f.id === item.id);
+
     const btnPlay = document.createElement("button");
     btnPlay.className = "btn-small";
     btnPlay.textContent = "▶";
     btnPlay.title = "Play now";
     btnPlay.onclick = () => playFromQueue(item.qid, item.id);
+
+    const btnStar = document.createElement("button");
+    btnStar.className = "btn-small";
+    btnStar.textContent = isFav ? "★" : "☆";
+    btnStar.title = isFav ? "Remove from favorites" : "Add to favorites";
+    btnStar.onclick = () => toggleFavoriteItem(item.id, item.title, item.id === currentVideoId ? 1 : 0);
 
     const btnRemove = document.createElement("button");
     btnRemove.className = "btn-small";
@@ -685,7 +703,7 @@ function renderQueue(q) {
     btnRemove.title = "Remove";
     btnRemove.onclick = () => removeFromQueue(item.qid);
 
-    div.append(thumb, meta, btnPlay, btnRemove);
+    div.append(thumb, meta, btnPlay, btnStar, btnRemove);
     list.appendChild(div);
   });
 }
