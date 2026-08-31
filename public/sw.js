@@ -1,9 +1,10 @@
 // Service worker: caches the app shell for fast/offline load
-const CACHE = "skood-v3";
+const CACHE = "skood-v4";
 const SHELL = [
   "/",
   "/index.html",
   "/style.css",
+  "/names.js",
   "/script.js",
   "/socket.io/socket.io.js",
   "/icon.svg",

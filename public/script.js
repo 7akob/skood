@@ -53,12 +53,11 @@ let currentQueueLength = 0;
 // Nobody should be met by a modal asking who they are before they have even
 // seen the page, so a name is picked for you and shown in the lobby where you
 // can change it like any other field.
-const NAME_ADJECTIVES = ["Happy", "Sleepy", "Turbo", "Retro", "Cosmic", "Neon", "Mellow", "Snappy", "Groovy", "Pixel"];
-const NAME_ANIMALS = ["Otter", "Panda", "Falcon", "Gecko", "Walrus", "Badger", "Puffin", "Moose", "Heron", "Lynx"];
+// The word lists live in names.js, which loads before this file.
 
 function randomName() {
   const pick = (list) => list[Math.floor(Math.random() * list.length)];
-  return pick(NAME_ADJECTIVES) + pick(NAME_ANIMALS);
+  return pick(NAME_ADJECTIVES) + pick(NAME_NOUNS);
 }
 
 let username = null;
